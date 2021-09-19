@@ -55,12 +55,12 @@ void SWSurface::drawPixel(uint16_t x, uint16_t y, color_t color){
 
 void SWSurface::drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, color_t color){
     // Bresenham algorithm
-    
+    // LOOKAT: Adafruit GFX GitHub
 }
 
 void SWSurface::drawFastVLine(uint16_t x0, uint16_t y0, uint16_t length, color_t color){
     for(uint16_t offset = 0; offset < length; offset++){
-        this->drawPixel(x0, y0 + length, color);
+        this->drawPixel(x0, y0 + offset, color);
     }
 }
 
