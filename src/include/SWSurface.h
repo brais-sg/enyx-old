@@ -14,6 +14,7 @@
 
 #include "AGL.h"
 
+// Color depth in bytes 
 #ifdef AGL_COLOR_16BIT
 #define COLOR_DEPTH 4
 #else
@@ -22,15 +23,27 @@
 
 class SWSurface : public AGL {
     private:
-        uint8_t* pm;
+        color_t* pm;
         uint16_t width;
-        uint16_t heigth;
+        uint16_t height;
     
     public:
         SWSurface();
-        SWSurface(uint16_t width, uint16_t heigth);
+        SWSurface(uint16_t width, uint16_t height);
+        ~SWSurface();
 
+        void*    getPixmap();
 
+        uint16_t getWidth()  const;
+        uint16_t getHeight() const;
+        uint8_t getPixelDepth() const;
+        
+        // Drawing functions
+        void drawPixel(uint16_t x, uint16_t y, color_t color);
+        void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, color_t color);
+        
+        void drawFastVLine(uint16_t x0, uint16_t y0, uint16_t length, color_t color);
+        void drawFastHLine(uint16_t x0, uint16_t y0, uint16_t length, color_t color);
 
 
 };

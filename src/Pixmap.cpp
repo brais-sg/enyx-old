@@ -15,7 +15,7 @@
 Pixmap::Pixmap(){
     this->pm = NULL;
     this->width  = 0;
-    this->heigth = 0;
+    this->height = 0;
     this->bpp    = 0;
 }
 
@@ -23,7 +23,7 @@ Pixmap::Pixmap(uint16_t width, uint16_t heigth, uint8_t bpp){
     this->pm = (uint8_t*) malloc(width * heigth * bpp);
     if(this->pm){
         this->width  = width;
-        this->heigth = heigth;
+        this->height = heigth;
         this->bpp    = bpp;
     }
 }
@@ -32,7 +32,7 @@ Pixmap::Pixmap(uint16_t width, uint16_t heigth){
     this->pm = (uint8_t*) malloc(width * heigth * 4);
     if(this->pm){
         this->width  = width;
-        this->heigth = heigth;
+        this->height = heigth;
         this->bpp    = bpp;
     }
 }
@@ -58,8 +58,8 @@ uint16_t Pixmap::getWidth() const {
     return this->width;
 }
 
-uint16_t Pixmap::getHeigth() const {
-    return this->heigth;
+uint16_t Pixmap::getHeight() const {
+    return this->height;
 }
 
 uint8_t Pixmap::getBpp() const {

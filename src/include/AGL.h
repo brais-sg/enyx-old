@@ -59,6 +59,7 @@ typedef uint32_t rgba_t;
 // AGL Interface (Adafruit GFX-Like API). All Enyx versions will have this API
 class AGL {
     public:
+        // Drawing methods
         virtual void drawPixel(uint16_t x, uint16_t y, color_t color);
         virtual void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, color_t color);
         // Fast drawing functions
@@ -89,6 +90,10 @@ class AGL {
         virtual void clear();
         virtual void fillScreen(color_t color);
 
+        // Screen methods
+        virtual uint16_t getWidth()      const;
+        virtual uint16_t getHeight()     const;
+        virtual uint8_t  getPixelDepth() const;
 };
 
 
