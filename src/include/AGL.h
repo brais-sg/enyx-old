@@ -60,31 +60,31 @@ typedef uint32_t rgba_t;
 class AGL {
     public:
         // Drawing methods
-        virtual void drawPixel(uint16_t x, uint16_t y, color_t color) = 0;
-        virtual void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, color_t color) = 0;
+        virtual void drawPixel(int x, int y, color_t color) = 0;
+        virtual void drawLine(int x0, int y0, int x1, int y1, color_t color) = 0;
         // Fast drawing functions
-        virtual void drawFastVLine(uint16_t x0, uint16_t y0, uint16_t length, color_t color) = 0;
-        virtual void drawFastHLine(uint16_t x0, uint16_t y0, uint16_t length, color_t color) = 0;
+        virtual void drawFastVLine(int x0, int y0, int length, color_t color) = 0;
+        virtual void drawFastHLine(int x0, int y0, int length, color_t color) = 0;
         
-        virtual void drawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, color_t color) = 0;
-        virtual void drawFillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, color_t color) = 0;
+        virtual void drawRect(int x, int y, int w, int h, color_t color) = 0;
+        virtual void drawFillRect(int x, int y, int w, int h, color_t color) = 0;
 
-        virtual void drawCircle(uint16_t x, uint16_t y, uint16_t r, color_t color) = 0;
-        virtual void drawFillCircle(uint16_t x, uint16_t y, uint16_t r, color_t color) = 0;
+        virtual void drawCircle(int x, int y, int r, color_t color) = 0;
+        virtual void drawFillCircle(int x, int y, int r, color_t color) = 0;
 
-        virtual void drawRoundRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t r, color_t color) = 0;
-        virtual void drawFillRoundRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t r, color_t color) = 0;
+        virtual void drawRoundRect(int x, int y, int w, int h, int r, color_t color) = 0;
+        virtual void drawFillRoundRect(int x, int y, int w, int h, int r, color_t color) = 0;
 
-        virtual void drawTriangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, color_t color) = 0;
-        virtual void drawFillTriangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, color_t color) = 0;
+        virtual void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color) = 0;
+        virtual void drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color) = 0;
         
-        virtual void drawChar(uint16_t x, uint16_t y, char c, color_t color, uint8_t size) = 0;
-        virtual void drawChar(uint16_t x, uint16_t y, char c, color_t color) = 0; // Default size
+        virtual void drawChar(int x, int y, char c, color_t color, uint8_t size) = 0;
+        virtual void drawChar(int x, int y, char c, color_t color) = 0; // Default size
 
         // virtual void drawChar(uint16_t x, uint16_t y, char c, color_t color, color_t bg, uint8_t size);
         
-        virtual void drawText(uint16_t x, uint16_t y, const char* text, color_t color, uint8_t size) = 0;
-        virtual void drawText(uint16_t x, uint16_t y, const char* text, color_t color) = 0; // Default size
+        virtual void drawText(int x, int y, const char* text, color_t color, uint8_t size) = 0;
+        virtual void drawText(int x, int y, const char* text, color_t color) = 0; // Default size
 
         virtual void clearColor(color_t color) = 0;
         virtual void clear() = 0;
@@ -94,6 +94,24 @@ class AGL {
         virtual uint16_t getWidth()      const = 0;
         virtual uint16_t getHeight()     const = 0;
         virtual uint8_t  getPixelDepth() const = 0;
+
+        // Transformations
+        virtual void origin(); // Reset all transformations
+
+        virtual void translate(float x, float y);
+        virtual void rotate(float rad);
+        virtual void scale(float sx, float sy);
+
+
+        // Window (Viewport)
+        virtual void setWindow(int x, int y, int w, int h) = 0;
+        virtual void setWindow() = 0; // Remove window
+
+        // Render / submit
+        virtual void submit() = 0;  // Submit buffers to GPU on hardware-accelerated contexts
+        virtual void render()  = 0; // Force render (waits for renderer (glFlush & glFinish on OpenGL contexts)) 
+
+
 };
 
 

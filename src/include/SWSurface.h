@@ -39,11 +39,11 @@ class SWSurface : public AGL {
         uint8_t getPixelDepth() const;
         
         // Drawing functions
-        void drawPixel(uint16_t x, uint16_t y, color_t color);
-        void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, color_t color);
+        void drawPixel(int x, int y, color_t color);
+        void drawLine(int x0, int y0, int x1, int y1, color_t color);
         
-        void drawFastVLine(uint16_t x0, uint16_t y0, uint16_t length, color_t color);
-        void drawFastHLine(uint16_t x0, uint16_t y0, uint16_t length, color_t color);
+        void drawFastVLine(int x0, int y0, int length, color_t color);
+        void drawFastHLine(int x0, int y0, int length, color_t color);
 
 
 };

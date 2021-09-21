@@ -14,6 +14,19 @@
 #include "AGL.h"
 #include "SWSurface.h"
 
+#ifndef abs
+#define abs(x) (((x) > 0) ? (x) : (-(x)))
+#endif
+
+#ifndef _swap_int
+#define _swap_int(a, b)                                                    \
+  {                                                                            \
+    int _tmp = a;                                                             \
+    a = b;                                                                     \
+    b = _tmp;                                                                     \
+  }
+#endif
+
 SWSurface::SWSurface(){
     this->pm = NULL;
     this->width  = 0;
@@ -49,23 +62,63 @@ uint8_t SWSurface::getPixelDepth() const {
 }
 
 
-void SWSurface::drawPixel(uint16_t x, uint16_t y, color_t color){
+void SWSurface::drawPixel(int x, int y, color_t color){
+    // Check if pixel is in surface area
+
     this->pm[y * width + x] = color;
 }
 
-void SWSurface::drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, color_t color){
+void SWSurface::drawLine(int x0, int y0, int x1, int y1, color_t color){
     // Bresenham algorithm
-    // LOOKAT: Adafruit GFX GitHub
+    // LOOKAT: https://github.com/adafruit/Adafruit-GFX-Library/blob/master/Adafruit_GFX.cpp#L132
+    int steep = abs(y1 - y0) > abs(x1 - x0);
+    if(steep){
+        _swap_int(x0,x1);
+        _swap_int(x1,y1);
+    }
+
+    if(x0 > x1){
+        _swap_int(x0, x1);
+        _swap_int(y0, y1);
+    }
+
+    int dx, dy;
+    dx = x1 - x0;
+    dy = abs(y1 - y0);
+
+    int err = dx >> 1;
+    int ystep;
+
+    if(y0 < y1){
+        ystep = 1;
+    } else {
+        ystep = -1;
+    }
+
+    while(x0 <= x1){
+        if(steep){
+            this->drawPixel(y0, x0, color);
+        } else {
+            this->drawPixel(x0, y0, color);
+        }
+        err -= dy;
+        if(err < 0){
+            y0  += ystep;
+            err += dx;
+        }
+
+        x0++;
+    }
 }
 
-void SWSurface::drawFastVLine(uint16_t x0, uint16_t y0, uint16_t length, color_t color){
-    for(uint16_t offset = 0; offset < length; offset++){
+void SWSurface::drawFastVLine(int x0, int y0, int length, color_t color){
+    for(int offset = 0; offset < length; offset++){
         this->drawPixel(x0, y0 + offset, color);
     }
 }
 
-void SWSurface::drawFastHLine(uint16_t x0, uint16_t y0, uint16_t length, color_t color){
-    for(uint16_t offset = 0; offset < length; offset++){
+void SWSurface::drawFastHLine(int x0, int y0, int length, color_t color){
+    for(int offset = 0; offset < length; offset++){
         this->drawPixel(x0 + offset, y0, color);
     }
 }
