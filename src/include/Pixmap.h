@@ -29,6 +29,8 @@ class Pixmap {
 
         void    setPixel(uint16_t x, uint16_t y, rgba_t color);
         rgba_t  getPixel(uint16_t x, uint16_t y);
+        void    clear();
+        
         uint16_t getWidth()  const;
         uint16_t getHeight() const;
         uint8_t  getBpp()    const;

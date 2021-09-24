@@ -10,3 +10,6 @@
  */
 
 #include "AGL.h"
+#include "Pixmap.h"
+#include "Window.h"
+#include "WindowSDL2.h"

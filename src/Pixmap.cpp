@@ -10,6 +10,8 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
+
 #include "Pixmap.h"
 
 Pixmap::Pixmap(){
@@ -45,7 +47,7 @@ Pixmap::~Pixmap(){
 void Pixmap::setPixel(uint16_t x, uint16_t y, rgba_t color){
     uint32_t px_offset = (y * this->bpp * this->width) + (x * this->bpp);
 
-    if(x > 0 && x < this->width && y > 0 && y < this->height){
+    if(x >= 0 && x < this->width && y >= 0 && y < this->height){
         switch(this->bpp){
             case 4:
                 this->pm[px_offset + 3] = A(color);
@@ -66,7 +68,7 @@ rgba_t Pixmap::getPixel(uint16_t x, uint16_t y){
     uint32_t px_offset = (y * this->bpp * this->width) + (x * this->bpp);
     color_t color = 0;
 
-    if(x > 0 && x < this->width && y > 0 && y < this->height){
+    if(x >= 0 && x < this->width && y >= 0 && y < this->height){
         switch(this->bpp){
             case 4:
                 color |= this->pm[px_offset + 3] << 24;
@@ -83,6 +85,10 @@ rgba_t Pixmap::getPixel(uint16_t x, uint16_t y){
     }
 
     return color;
+}
+
+void Pixmap::clear(){
+    if(this->pm) memset(this->pm, 0, width * height * bpp);
 }
 
 void* Pixmap::getPixmap(){
