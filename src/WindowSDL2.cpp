@@ -39,7 +39,7 @@ int WindowSDL2::init(const char* title){
     }
 
     fprintf(stderr,"[%s:%d] WindowSDL2::init: Creating window...\n", __FILE__, __LINE__);
-    window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, wx, wy, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, wx, wy, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
 
     if(window == NULL){
         fprintf(stderr,"[%s:%d] WindowSDL2::init: Cannot create SDL2 Window...\n", __FILE__, __LINE__);
