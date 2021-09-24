@@ -31,6 +31,7 @@ class Window {
         virtual int resize(int width, int heigth) = 0;
         virtual int maximize()                    = 0;
         virtual int minimize()                    = 0;
+        virtual int restore()                     = 0;
         virtual int close()                       = 0;
         virtual int move(int px, int py)          = 0;
         virtual int getPosition(int* px, int* py) = 0;
@@ -48,7 +49,7 @@ class Window {
 
         // Events: Keyboard + Mouse
         // RELATIVE TO WINDOW!
-        virtual int getMouse(int* px, int* py);
+        virtual int getMouse(int* px, int* py)    = 0;
 
 
 

@@ -47,21 +47,28 @@ class WindowSDL2 : public Window {
         int resize(int width, int heigth);
         int maximize();
         int minimize();
+        int restore();
         int close();
         int move(int px, int py);
         int getPosition(int* px, int* py);
         int setTitle(const char* title);
 
-        int getScreenResolution(int* px, int* py);
+        //int getScreenResolution(int* px, int* py);
 
-        int fullscreen();
+        //int fullscreen();
 
-        bool isFullscreen();
+        //bool isFullscreen();
 
         // SDL2 specifics to interface renderer
-        SDL_GLContext createGLContext();
+        int createGLContext();
+        SDL_GLContext getGLContext();
+        SDL_Window*   getWindow();
+
         void GL_swapWindow();
         int SDL_GL_SetAttribute(SDL_GLattr attr, int value);
+        int SDL_GL_GetAttribute(SDL_GLattr attr, int *value);
+
+        void updateDimensions();
 
 
 
