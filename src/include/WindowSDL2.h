@@ -25,8 +25,6 @@
 #endif
 
 
-
-
 class WindowSDL2 : public Window {
     private:
         int wx, wy;
