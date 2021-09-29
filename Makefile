@@ -9,10 +9,12 @@ SRC  = src
 
 #$(SRC)/%.o: %.cpp $(DEPS)
 #	$(CC) -c -o $@ $< $(CFLAGS) -Iinclude
-all: Pixmap.o WindowSDL2.o Enyx
+all: Pixmap.o WindowSDL2.o MouseSDL2.o Enyx
 
 WindowSDL2.o: src/WindowSDL2.cpp
 	$(CC) -c src/WindowSDL2.cpp -I./src/include/ $(LIBS)
+MouseSDL2.o:  src/MouseSDL2.cpp
+	$(CC) -c src/MouseSDL2.cpp -I./src/include/ $(LIBS)
 Pixmap.o: src/Pixmap.cpp
 	$(CC) -c src/Pixmap.cpp -I./src/include/ $(LIBS)
 

@@ -21,7 +21,9 @@ class MouseSDL2 : public Mouse {
         uint32_t lastState;
         uint32_t currentState;
 
+        MousePosition heldPosition;
         MousePosition lastPosition;
+        MousePosition currentPosition;
     public:
         MouseSDL2();
         ~MouseSDL2();

@@ -22,6 +22,9 @@
 #define MOUSE_BUTTON_LEFT    _BV(0)
 #define MOUSE_BUTTON_MIDDLE  _BV(1)
 #define MOUSE_BUTTON_RIGHT   _BV(2)
+#define MOUSE_BUTTON_X1      _BV(3)
+#define MOUSE_BUTTON_X2      _BV(4)
+
 
 struct MousePosition {
     int x, y;
