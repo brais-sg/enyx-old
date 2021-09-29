@@ -30,7 +30,6 @@ WindowSDL2::~WindowSDL2(){
     }
 }
 
-
 int WindowSDL2::init(const char* title){
     fprintf(stderr,"[%s:%d] WindowSDL2::init: Starting SDL2...\n", __FILE__, __LINE__);
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0){

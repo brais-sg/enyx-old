@@ -45,8 +45,7 @@ void EventHandler::processEvents(){
 
         if(event.type == SDL_MOUSEMOTION){
             SDL_MouseMotionEvent* mouseEvent = (SDL_MouseMotionEvent*) &event;
-
-            
+            // TODO!
         }
 
     }

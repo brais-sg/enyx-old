@@ -20,7 +20,7 @@ class Window {
         virtual int destroy()               = 0;
 
         // Called every frame to update buffers
-        virtual int update()                = 0;
+        // virtual int update()                = 0;
 
         // Dimensions
         virtual int  getWidth()  = 0;
