@@ -41,8 +41,20 @@ struct event_info_t {
     uint32_t window_events;
     uint32_t keyboard_events;
     uint32_t mouse_events;
+    uint32_t controller_events;
     uint32_t touch_events;
     uint32_t exit_events;
+};
+
+struct event_handlers_struct_t {
+    event_cb_t unknown_handler;
+    event_cb_t common_handler;
+    event_cb_t window_handler;
+    event_cb_t keyboard_handler;
+    event_cb_t mouse_handler;
+    event_cb_t controller_handler;
+    event_cb_t touch_handler;
+    event_cb_t exit_handler;
 };
 
 
@@ -103,6 +115,9 @@ class Window {
 
         bool isResizable();
 
+        // Called from the SDL2 Window event handler
+        void window_handler_event(void* data);
+
         // SDL OpenGL context
         void GL_MakeCurrent(SDL_GLContext context);
         int  GL_SetAttribute(SDL_GLattr attr, int value);
@@ -115,8 +130,6 @@ class Window {
         void GL_DeleteContext(SDL_GLContext context);
         void GL_SwapWindow();
 };
-
-
 
 
 
