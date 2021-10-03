@@ -38,7 +38,6 @@ typedef uint32_t rgba_t;
 
 #define RGB(r,g,b)     (((r & 0xff) << 24) | ((g & 0xff) << 16) | ((b & 0xff) << 8) | 0xff)
 #define RGBA(r,g,b,a)  (((r & 0xff) << 24) | ((g & 0xff) << 16) | ((b & 0xff) << 8) | (a & 0xff))
-
 #endif
 
 // Some colors
