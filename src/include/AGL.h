@@ -94,9 +94,7 @@ class AGL {
         virtual void drawText(int x, int y, const char* text, color_t color, uint8_t size) = 0;
         virtual void drawText(int x, int y, const char* text, color_t color) = 0; // Default size
 
-
         // Clear screen methods
-
         virtual void clearColor(color_t color) = 0;
         virtual void clear() = 0;
         virtual void fillScreen(color_t color) = 0;
@@ -105,7 +103,6 @@ class AGL {
         virtual uint16_t getWidth()      const = 0;
         virtual uint16_t getHeight()     const = 0;
         virtual uint8_t  getPixelDepth() const = 0;
-
 
         // Render / submit
         virtual void submit() = 0;  // Submit buffers to GPU in hardware-accelerated contexts
