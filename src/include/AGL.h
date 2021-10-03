@@ -27,8 +27,6 @@ typedef uint32_t rgba_t;
 // 8 bit RGB to system color
 #define RGB(r,g,b)      
 #define RGBA(r,g,b,a)
-
-
 #else
 typedef uint32_t color_t;
 typedef uint32_t rgba_t;
@@ -59,6 +57,17 @@ typedef uint32_t rgba_t;
 // AGL Interface (Adafruit GFX-Like API). All Enyx versions will have this API
 class AGL {
     public:
+        // Viewport settings
+        virtual void window(int x, int y, int w, int h) = 0;
+        virtual void window() = 0;
+
+        // Coordinate transformations
+        virtual void origin() = 0;
+        virtual void translate(float tx, float ty) = 0;
+        virtual void rotate(float angle) = 0;
+        virtual void scale(float x, float y) = 0;
+        // Get/set transformation matrix is implemented in the renderer
+
         // Drawing methods
         virtual void drawPixel(int x, int y, color_t color) = 0;
         virtual void drawLine(int x0, int y0, int x1, int y1, color_t color) = 0;
@@ -86,6 +95,9 @@ class AGL {
         virtual void drawText(int x, int y, const char* text, color_t color, uint8_t size) = 0;
         virtual void drawText(int x, int y, const char* text, color_t color) = 0; // Default size
 
+
+        // Clear screen methods
+
         virtual void clearColor(color_t color) = 0;
         virtual void clear() = 0;
         virtual void fillScreen(color_t color) = 0;
@@ -95,20 +107,9 @@ class AGL {
         virtual uint16_t getHeight()     const = 0;
         virtual uint8_t  getPixelDepth() const = 0;
 
-        // Transformations
-        virtual void origin(); // Reset all transformations
-
-        virtual void translate(float x, float y);
-        virtual void rotate(float rad);
-        virtual void scale(float sx, float sy);
-
-
-        // Window (Viewport)
-        virtual void setWindow(int x, int y, int w, int h) = 0;
-        virtual void setWindow() = 0; // Remove window
 
         // Render / submit
-        virtual void submit() = 0;  // Submit buffers to GPU on hardware-accelerated contexts
+        virtual void submit() = 0;  // Submit buffers to GPU in hardware-accelerated contexts
         virtual void render()  = 0; // Force render (waits for renderer (glFlush & glFinish on OpenGL contexts)) 
 
 

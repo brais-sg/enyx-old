@@ -1,2 +1,2 @@
 # enyx
-Enyx Graphicsd Library
+Enyx Graphics Library
