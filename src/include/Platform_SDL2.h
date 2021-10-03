@@ -58,6 +58,14 @@ struct event_handlers_struct_t {
 };
 
 
+enum powerstate_t {
+    POWERSTATE_UNKNOWN    = 0,
+    POWERSTATE_ON_BATTERY = 1,
+    POWERSTATE_NO_BATTERY = 2,
+    POWERSTATE_CHARGING   = 3,
+    POWERSTATE_CHARGED    = 4
+};
+
 namespace Events {
     int  initEventSystem();
 
@@ -84,9 +92,11 @@ namespace System {
     int getSystemRAM();        // Total amount of RAM in KILOBYTES!
 
     // System power information
+    powerstate_t getPowerstate();
+    int getBatteryPercent();
+    int getBatteryLife();
 
     // Screen resolution
-
 
     // Android specific
     void*          AndroidGetJNI();
@@ -97,6 +107,11 @@ namespace System {
 };
 
 
+// Enyx init functions (SDL_Init)
+namespace Enyx {
+    int init();
+};
+
 class Window {
     private:
         SDL_Window* window;
@@ -105,6 +120,8 @@ class Window {
         Window(const char* title);
         ~Window();
 
+        int init(const char* title);
+
         void close();
         void minimize();
         void maximize();
@@ -112,8 +129,12 @@ class Window {
         void hide();
         void show();
         void resize(int width, int height);
+        void setTitle(const char* title);
 
         bool isResizable();
+
+        void getPosition(int* x, int* y);
+        void setPosition(int x, int y);
 
         // Called from the SDL2 Window event handler
         void window_handler_event(void* data);

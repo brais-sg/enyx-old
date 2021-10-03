@@ -20,8 +20,8 @@
 #include "Platform_SDL2.h"
 
 // EVENT SYSTEM CALLBACKS
-static SDL_Window* default_window = NULL;
-static bool        app_running    = false;
+static Window*  default_window = NULL;
+static bool     app_running    = false;
 
 static event_handlers_struct_t event_handlers;
 static event_info_t            event_info;
@@ -31,8 +31,11 @@ static void eventSystemCB_commonEventHandler(void* data){
 }
 
 static void eventSystemCB_windowEventHandler(void* data){
-
+    if(default_window){
+        default_window->window_handler_event(data);
+    }
 }
+
 
 static void eventSystemCB_keyboardEventHandler(void* data){
 
@@ -168,6 +171,17 @@ event_info_t Events::getEventsInfo(){
     return event_info;
 }
 
+// Enyx
+// Init Enyx GL subsystems (And SDL)
+int Enyx::init(){
+    if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
+        fprintf(stderr, "[%s:%d]: FATAL: Cannot init SDL2: Error: %s\n", __FILE__, __LINE__, SDL_GetError());
+        exit(-1);
+        return -1; // Never reached
+    }
+
+    return 0;
+}
 
 // System
 uint32_t System::millis(){
@@ -204,6 +218,43 @@ int System::getSystemRAM(){
     return SDL_GetSystemRAM() * 1024;
 }
 
+powerstate_t System::getPowerstate(){
+    switch(SDL_GetPowerInfo(NULL, NULL)){
+        case SDL_POWERSTATE_UNKNOWN:
+            return POWERSTATE_UNKNOWN;
+            break;
+        case SDL_POWERSTATE_ON_BATTERY:
+            return POWERSTATE_ON_BATTERY;
+            break;
+        case SDL_POWERSTATE_NO_BATTERY:
+            return POWERSTATE_NO_BATTERY;
+            break;
+        case SDL_POWERSTATE_CHARGING:
+            return POWERSTATE_CHARGING;
+            break;
+        case SDL_POWERSTATE_CHARGED:
+            return POWERSTATE_CHARGED;
+            break;
+        default:
+            return POWERSTATE_UNKNOWN;
+    }
+}
+
+int System::getBatteryPercent(){
+    int percent;
+    if(SDL_GetPowerInfo(NULL, &percent) == SDL_POWERSTATE_UNKNOWN){
+        return -1;
+    }
+    return percent;
+}
+
+int System::getBatteryLife(){
+    int seconds;
+    if(SDL_GetPowerInfo(&seconds, NULL) == SDL_POWERSTATE_UNKNOWN){
+        return -1;
+    }
+    return seconds;
+}
 
 // Android specific (NOT IMPLEMENTED FOR NOW)
 void* System::AndroidGetJNI(){
@@ -221,4 +272,131 @@ const char* System::AndroidGetExternalStoragePath(){
 int System::AndroidGetExternalStorageState(){
     return 0;
 }
+
+// Window class implementation
+
+Window::Window(){
+    this->window = NULL;
+}
+
+Window::Window(const char* title){
+    this->window = NULL;
+    this->init(title);
+}
+
+Window::~Window(){
+    if(this->window){
+        this->close();
+    }
+}
+
+
+int Window::init(const char* title){
+    this->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
+    if(this->window){
+        if(default_window == NULL) default_window == this;
+        return 0;
+    } else {
+        fprintf(stderr, "[%s:%d] ERROR: Cannot create Window! Error: %s\n", __FILE__,__LINE__, SDL_GetError());
+        return -1;
+    }
+}
+
+void Window::close(){
+    if(default_window) default_window = NULL;
+    fprintf(stderr, "[%s:%d]: INFO: Deleting window %p\n", __FILE__, __LINE__, this);
+    SDL_DestroyWindow(this->window);
+}
+
+void Window::minimize(){
+    SDL_MinimizeWindow(this->window);
+}
+
+void Window::maximize(){
+    SDL_MaximizeWindow(this->window);
+}
+
+void Window::restore(){
+    SDL_RestoreWindow(this->window);
+}
+
+void Window::hide(){
+    SDL_HideWindow(this->window);
+}
+
+void Window::show(){
+    SDL_ShowWindow(this->window);
+}
+
+void Window::resize(int width, int height){
+    SDL_SetWindowSize(this->window, width, height);
+}
+
+void Window::setTitle(const char* title){
+    SDL_SetWindowTitle(this->window, title);
+}
+
+// This returns false in case of:
+//  1. Non resizable window (duh)
+//  2. Android device, fullscreen
+//  3. Raspberry Pi in video framebuffer mode
+bool Window::isResizable(){
+    if(SDL_GetWindowFlags(this->window) & SDL_WINDOW_RESIZABLE){
+        return true;
+    }
+
+    if(strcmp(SDL_GetPlatform(), "Android") == 0){
+        return false;
+    }
+
+    return false;
+}
+
+
+void Window::getPosition(int* x, int* y){
+    SDL_GetWindowPosition(this->window, x, y);
+}
+
+void Window::setPosition(int x, int y){
+    SDL_SetWindowPosition(this->window, x, y);
+}
+
+void Window::window_handler_event(void* data){
+    // Process WINDOW type events
+
+}
+
+// SDL OpenGL Methods for the renderer (internal use only)
+void Window::GL_MakeCurrent(SDL_GLContext context){
+    SDL_GL_MakeCurrent(this->window, context);
+}
+
+int Window::GL_SetAttribute(SDL_GLattr attr, int value){
+    return SDL_GL_SetAttribute(attr, value);
+}
+
+int Window::GL_SetSwapInterval(int interval){
+    return SDL_GL_SetSwapInterval(interval);
+}
+
+bool Window::GL_ExtensionSupported(const char* extension){
+    return (SDL_GL_ExtensionSupported(extension) == SDL_TRUE) ? true : false;
+}
+
+void* Window::GL_GetProcAddress(const char* proc){
+    return SDL_GL_GetProcAddress(proc);
+}
+
+SDL_GLContext Window::GL_CreateContext(){
+    return SDL_GL_CreateContext(this->window);
+}
+
+void Window::GL_DeleteContext(SDL_GLContext context){
+    SDL_GL_DeleteContext(context);
+}
+
+void Window::GL_SwapWindow(){
+    SDL_GL_SwapWindow(this->window);
+}
+
 

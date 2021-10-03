@@ -66,6 +66,8 @@ class AGL {
         virtual void rotate(float angle) = 0;
         virtual void scale(float x, float y) = 0;
         // Get/set transformation matrix is implemented in the renderer
+        // getTransformationMatrix() / setTransformationMatrix() is renderer specific
+        
 
         // Drawing methods
         virtual void drawPixel(int x, int y, color_t color) = 0;
