@@ -363,7 +363,7 @@ void Window::setPosition(int x, int y){
 
 void Window::window_handler_event(void* data){
     // Process WINDOW type events
-
+    
 }
 
 // SDL OpenGL Methods for the renderer (internal use only)
