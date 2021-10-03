@@ -35,7 +35,6 @@ static void _id_progress_report(float progress){
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb/stb_image_resize.h"
 
-
 int ID::infoImage(const char* fileName, int* sx, int* sy, int* n){
     return stbi_info(fileName, sx, sy, n);
 }
@@ -56,6 +55,8 @@ void ID::freeImage(void* image_ptr){
 }
 
 int ID::writeImage(const char* fileName, int w, int h, int n, void* data){
+    if(data == NULL) return -1;
+
     // Find last '.' for extension
     int lenptr = strlen(fileName);
     while(lenptr > 0){
@@ -95,6 +96,8 @@ int ID::writeImage(const char* fileName, int w, int h, int n, void* data){
 }
 
 int ID::writeImage(const char* fileName, int w, int h, int n, void* data, int q){
+    if(data == NULL) return -1;
+
     fprintf(stderr, "[%s:%d]: ID::writeImage: Writing JPG image %s with quality %d...\n", __FILE__, __LINE__, fileName, q);
     stbi_write_jpg(fileName, w, h, n, data, q);
     return 0;
@@ -105,6 +108,8 @@ void ID::resizingCallback(progress_callback_t callback){
 }
 
 int ID::resizeImage(void* input, int in_w, int in_h, void* output, int out_w, int out_h, int n){
+    if(input == NULL || output == NULL) return 1;
+    
     fprintf(stderr, "[%s:%d]: ID::resizeImage: Resizing image (%dx%d)->(%dx%d)...\n", __FILE__, __LINE__, in_w, in_h, out_w, out_h);
     stbir_resize_uint8((uint8_t*) input, in_w, in_h, 0, (uint8_t*) output, out_w, out_h, 0, n);
     return 0;
