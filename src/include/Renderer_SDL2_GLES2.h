@@ -64,6 +64,10 @@ class Renderer_SDL2_GLES2 : public AGL {
         float* v4col_array;
         float* v2txc_array;
 
+        uint32_t v3pos_count;
+        uint32_t v4col_count;
+        uint32_t v2txc_count;
+
         uint32_t max_elements;
         uint32_t current_elements;
     public:
@@ -71,12 +75,11 @@ class Renderer_SDL2_GLES2 : public AGL {
         Renderer_SDL2_GLES2(Window* window);
         ~Renderer_SDL2_GLES2();
 
+        // Batch size
+        void setBatchSize(uint32_t batch_size);
+        int  getBatchSize();
 
-
-
-
-
-
+        
 
 
 
