@@ -34,12 +34,25 @@ enum shader_type_t {
     FRAGMENT_PROGRAM       = 99
 };
 
+
+/*
+    ATTRIB LOCATION (glBindAttribLocation)
+     -> vertex position:  0
+     -> color position:   1
+     -> texture position: 2
+
+*/
+
 class GL_Shader {
     private:
         GLuint program_id;
 
         GLuint vertex_shader_id;
         GLuint fragment_shader_id;
+
+        GLint vertex_attrib;
+        GLint color_attrib;
+        GLint texture_attrib;
     public:
         GL_Shader();
         ~GL_Shader();
@@ -47,6 +60,11 @@ class GL_Shader {
         void shaderSource(shader_type_t type, const char* source);
         void compileShader();
         void linkShader();
+
+        GLint getUniformLocation(const char* uniform);
+        GLint getAttribLocation(const char* attribute);
+
+
 
         // Enable / disable attributes
         void attachShader();
@@ -79,7 +97,7 @@ class Renderer_SDL2_GLES2 : public AGL {
         void setBatchSize(uint32_t batch_size);
         int  getBatchSize();
 
-        
+
 
 
 
