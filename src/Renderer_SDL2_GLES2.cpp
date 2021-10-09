@@ -233,25 +233,6 @@ Matrix4::Matrix4(){
     e[15] = 0.0f;
 }
 
-void Matrix4::loadIdentity(){
-    e[0]  = 1.0f;
-    e[1]  = 0.0f;
-    e[2]  = 0.0f;
-    e[3]  = 0.0f;
-    e[4]  = 0.0f;
-    e[5]  = 1.0f;
-    e[6]  = 0.0f;
-    e[7]  = 0.0f;
-    e[8]  = 0.0f;
-    e[9]  = 0.0f;
-    e[10] = 1.0f;
-    e[11] = 0.0f;
-    e[12] = 0.0f;
-    e[13] = 0.0f;
-    e[14] = 0.0f;
-    e[15] = 1.0f;
-}
-
 Matrix4 Matrix4::operator+(const Matrix4& other) const {
     Matrix4 _ret = Matrix4();
 
@@ -285,12 +266,141 @@ Matrix4 Matrix4::operator+(const Matrix4& other) const {
 Matrix4 Matrix4::operator*(const Matrix4& other) const {
     Matrix4 _ret = Matrix4();
 
-    
+    _ret.e[0]  = this->e[0] * other.e[0] + this->e[4] * other.e[1] + this->e[8]  * other.e[2] + this->e[12] * other.e[3];
+    _ret.e[1]  = this->e[1] * other.e[0] + this->e[5] * other.e[1] + this->e[9]  * other.e[2] + this->e[13] * other.e[3];
+    _ret.e[2]  = this->e[2] * other.e[0] + this->e[6] * other.e[1] + this->e[10] * other.e[2] + this->e[14] * other.e[3];
+    _ret.e[3]  = this->e[3] * other.e[0] + this->e[7] * other.e[1] + this->e[11] * other.e[2] + this->e[15] * other.e[3];
 
+    _ret.e[4]  = this->e[0] * other.e[4] + this->e[4] * other.e[5] + this->e[8]  * other.e[6] + this->e[12] * other.e[7];
+    _ret.e[5]  = this->e[1] * other.e[4] + this->e[5] * other.e[5] + this->e[9]  * other.e[6] + this->e[13] * other.e[7];
+    _ret.e[6]  = this->e[2] * other.e[4] + this->e[6] * other.e[5] + this->e[10] * other.e[6] + this->e[14] * other.e[7];
+    _ret.e[7]  = this->e[3] * other.e[4] + this->e[7] * other.e[5] + this->e[11] * other.e[6] + this->e[15] * other.e[7];
+
+    _ret.e[8]  = this->e[0] * other.e[8] + this->e[4] * other.e[9] + this->e[8]  * other.e[10] + this->e[12] * other.e[11];
+    _ret.e[9]  = this->e[1] * other.e[8] + this->e[5] * other.e[9] + this->e[9]  * other.e[10] + this->e[13] * other.e[11];
+    _ret.e[10] = this->e[2] * other.e[8] + this->e[6] * other.e[9] + this->e[10] * other.e[10] + this->e[14] * other.e[11];
+    _ret.e[11] = this->e[3] * other.e[8] + this->e[7] * other.e[9] + this->e[11] * other.e[10] + this->e[15] * other.e[11];
+
+    _ret.e[12] = this->e[0] * other.e[12] + this->e[4] * other.e[13] + this->e[8]  * other.e[14] + this->e[12] * other.e[15];
+    _ret.e[13] = this->e[1] * other.e[12] + this->e[5] * other.e[13] + this->e[9]  * other.e[14] + this->e[13] * other.e[15];
+    _ret.e[14] = this->e[2] * other.e[12] + this->e[6] * other.e[13] + this->e[10] * other.e[14] + this->e[14] * other.e[15];
+    _ret.e[15] = this->e[3] * other.e[12] + this->e[7] * other.e[13] + this->e[11] * other.e[14] + this->e[15] * other.e[15];
 
     return _ret;
 }
 
+void Matrix4::loadIdentity(){
+    e[0]  = 1.0f;
+    e[1]  = 0.0f;
+    e[2]  = 0.0f;
+    e[3]  = 0.0f;
+    e[4]  = 0.0f;
+    e[5]  = 1.0f;
+    e[6]  = 0.0f;
+    e[7]  = 0.0f;
+    e[8]  = 0.0f;
+    e[9]  = 0.0f;
+    e[10] = 1.0f;
+    e[11] = 0.0f;
+    e[12] = 0.0f;
+    e[13] = 0.0f;
+    e[14] = 0.0f;
+    e[15] = 1.0f;
+}
+
+float* Matrix4::getArray(){
+    return this->e;
+}
+
+/*  
+ *  0  4  8  12
+ *  1  5  9  13
+ *  2  6  10 14
+ *  3  7  11 15
+ */
+
+
+Matrix4 Matrix4::translation(float tx, float ty){
+    Matrix4 R = Matrix4();
+    R.loadIdentity();
+
+    R.e[12] = tx;
+    R.e[13] = ty;
+    R.e[14] = 1.f;
+
+    return R;
+}
+
+Matrix4 Matrix4::translation(float tx, float ty, float tz){
+    Matrix4 R = Matrix4();
+    R.loadIdentity();
+
+    R.e[12] = tx;
+    R.e[13] = ty;
+    R.e[14] = tz;
+
+    return R;
+}
+
+Matrix4 Matrix4::rotating(float angle){
+    Matrix4 R = Matrix4();
+    R.loadIdentity();
+
+    float rcos = cos(angle);
+    float rsin = sin(angle);
+
+    R.e[0] = rcos;
+    R.e[1] = rsin;
+    R.e[4] = -rsin;
+    R.e[5] = rcos;
+
+    return R;
+}
+
+Matrix4 Matrix4::scaling(float sx, float sy){
+    Matrix4 R = Matrix4();
+    R.loadIdentity();
+
+    R.e[0] = sx;
+    R.e[5] = sy;
+
+    return R;
+}
+
+Matrix4 Matrix4::scaling(float sx, float sy, float sz){
+    Matrix4 R = Matrix4();
+    R.loadIdentity();
+
+    R.e[0]  = sx;
+    R.e[5]  = sy;
+    R.e[10] = sz;
+
+    return R;
+}
+
+/*  
+ *  0  4  8  12
+ *  1  5  9  13
+ *  2  6  10 14
+ *  3  7  11 15
+ */
+
+Matrix4 Matrix4::ortho(float left, float right, float bottom, float top, float znear, float zfar){
+    Matrix4 R = Matrix4();
+    // R.loadIdentity(); // Not needed! Optimized
+
+    R.e[0]  = 2.0f / (right - left);
+    R.e[5]  = 2.0f / (top - bottom);
+    R.e[10] = 2.0f / (zfar - znear);
+
+    // Translate vector
+    R.e[12] = -(right + left) / (right - left);
+    R.e[13] = -(top + bottom) / (top - bottom);
+    R.e[14] = -(zfar + znear) / (zfar - znear);
+    R.e[15] = 1.f;
+
+    return R;
+}
 
 
 // Renderer implementation starts here

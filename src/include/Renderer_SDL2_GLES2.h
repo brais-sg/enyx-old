@@ -94,17 +94,19 @@ class Matrix4 {
         float e[16];  
         Matrix4();
 
-        Matrix4 operator*(const Matrix4& other) const;
         Matrix4 operator+(const Matrix4& other) const;
-
+        Matrix4 operator*(const Matrix4& other) const;
+        
         void loadIdentity();
         float* getArray();
 
-        void translate();
-        void rotate();
-        void scale();
+        Matrix4 translation(float tx, float ty);
+        Matrix4 translation(float tx, float ty, float tz); // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
+        Matrix4 rotating(float angle);
+        Matrix4 scaling(float sx, float sy);
+        Matrix4 scaling(float sx, float sy, float sz); // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
 
-        void ortho(float left, float right, float bottom, float top, float znear, float zfar);
+        Matrix4 ortho(float left, float right, float bottom, float top, float znear, float zfar);
 };
 
 class Renderer_SDL2_GLES2 : public AGL {
