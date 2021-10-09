@@ -205,9 +205,95 @@ void GL_Shader::dettach(){
     // glUseProgram(0);
 }
 
-// Renderer!
+// Matrix4 implementation here
+
+/*  
+ *  0  4  8  12
+ *  1  5  9  13
+ *  2  6  10 14
+ *  3  7  11 15
+ */
+
+Matrix4::Matrix4(){
+    e[0]  = 0.0f;
+    e[1]  = 0.0f;
+    e[2]  = 0.0f;
+    e[3]  = 0.0f;
+    e[4]  = 0.0f;
+    e[5]  = 0.0f;
+    e[6]  = 0.0f;
+    e[7]  = 0.0f;
+    e[8]  = 0.0f;
+    e[9]  = 0.0f;
+    e[10] = 0.0f;
+    e[11] = 0.0f;
+    e[12] = 0.0f;
+    e[13] = 0.0f;
+    e[14] = 0.0f;
+    e[15] = 0.0f;
+}
+
+void Matrix4::loadIdentity(){
+    e[0]  = 1.0f;
+    e[1]  = 0.0f;
+    e[2]  = 0.0f;
+    e[3]  = 0.0f;
+    e[4]  = 0.0f;
+    e[5]  = 1.0f;
+    e[6]  = 0.0f;
+    e[7]  = 0.0f;
+    e[8]  = 0.0f;
+    e[9]  = 0.0f;
+    e[10] = 1.0f;
+    e[11] = 0.0f;
+    e[12] = 0.0f;
+    e[13] = 0.0f;
+    e[14] = 0.0f;
+    e[15] = 1.0f;
+}
+
+Matrix4 Matrix4::operator+(const Matrix4& other) const {
+    Matrix4 _ret = Matrix4();
+
+    _ret.e[0]  = this->e[0]  + other.e[0];
+    _ret.e[1]  = this->e[1]  + other.e[1];
+    _ret.e[2]  = this->e[2]  + other.e[2];
+    _ret.e[3]  = this->e[3]  + other.e[3];
+    _ret.e[4]  = this->e[4]  + other.e[4];
+    _ret.e[5]  = this->e[5]  + other.e[5];
+    _ret.e[6]  = this->e[6]  + other.e[6];
+    _ret.e[7]  = this->e[7]  + other.e[7];
+    _ret.e[8]  = this->e[8]  + other.e[8];
+    _ret.e[9]  = this->e[9]  + other.e[9];
+    _ret.e[10] = this->e[10] + other.e[10];
+    _ret.e[11] = this->e[11] + other.e[11];
+    _ret.e[12] = this->e[12] + other.e[12];
+    _ret.e[13] = this->e[13] + other.e[13];
+    _ret.e[14] = this->e[14] + other.e[14];
+    _ret.e[15] = this->e[15] + other.e[15];
+
+    return _ret;
+}
+
+/*  
+ *  0  4  8  12
+ *  1  5  9  13
+ *  2  6  10 14
+ *  3  7  11 15
+ */
+
+Matrix4 Matrix4::operator*(const Matrix4& other) const {
+    Matrix4 _ret = Matrix4();
+
+    
 
 
+    return _ret;
+}
+
+
+
+// Renderer implementation starts here
 Renderer_SDL2_GLES2::Renderer_SDL2_GLES2(){
     window   = NULL;
     gContext = NULL;
@@ -379,7 +465,6 @@ int Renderer_SDL2_GLES2::getBatchSize() const {
 int Renderer_SDL2_GLES2::getCurrentBatchSize() const {
     return current_elements;
 }
-
 
 
 // Renderer implementation starts here

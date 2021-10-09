@@ -92,6 +92,19 @@ class GL_Shader {
 class Matrix4 {
     public:
         float e[16];  
+        Matrix4();
+
+        Matrix4 operator*(const Matrix4& other) const;
+        Matrix4 operator+(const Matrix4& other) const;
+
+        void loadIdentity();
+        float* getArray();
+
+        void translate();
+        void rotate();
+        void scale();
+
+        void ortho(float left, float right, float bottom, float top, float znear, float zfar);
 };
 
 class Renderer_SDL2_GLES2 : public AGL {
