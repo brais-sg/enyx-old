@@ -113,14 +113,23 @@ class Renderer_SDL2_GLES2 : public AGL {
         uint32_t current_elements;
 
         drawing_state_t d_state;
+
+        // Shaders
+        GL_Shader basicShader;
+        GL_Shader textureShader;
     public:
         Renderer_SDL2_GLES2();
         Renderer_SDL2_GLES2(Window* window);
         ~Renderer_SDL2_GLES2();
 
+        // init and setWindow
+        void setWindow(Window* window);
+        int  init();
+
         // Batch size
         void setBatchSize(uint32_t batch_size);
-        int  getBatchSize();
+        int  getBatchSize()        const;
+        int  getCurrentBatchSize() const;
 
         // Implementation of AGL API
 
