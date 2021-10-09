@@ -34,6 +34,16 @@ enum shader_type_t {
     FRAGMENT_PROGRAM       = 99
 };
 
+enum drawing_state_t {
+    DRAWING_STATE_NONE   = 0,
+    DRAWING_STATE_READY  = 1,
+
+    DRAWING_STATE_POINTS             = 2,
+    DRAWING_STATE_LINES              = 3,
+    DRAWING_STATE_TRIANGLES          = 4,
+    DRAWING_STATE_TEXTURED_TRIANGLES = 5
+};
+
 
 /*
     ATTRIB LOCATION (glBindAttribLocation)
@@ -52,23 +62,36 @@ class GL_Shader {
 
         GLint vertex_attrib;
         GLint color_attrib;
-        GLint texture_attrib;
+        GLint texcoord_attrib;
+
+        GLint tmtrx_uniform;
+        GLint textureunit_uniform;
     public:
         GL_Shader();
         ~GL_Shader();
 
         void shaderSource(shader_type_t type, const char* source);
-        void compileShader();
-        void linkShader();
+        int compileShader();
+        int linkShader();
 
         GLint getUniformLocation(const char* uniform);
         GLint getAttribLocation(const char* attribute);
 
+        GLint getVertexAttrib()   const;
+        GLint getColorAttrib()    const;
+        GLint getTexcoordAttrib() const;
 
+        GLint getTransformMatrixUniform() const;
+        GLint getTextureUnitUniform()     const;
 
         // Enable / disable attributes
-        void attachShader();
-        void dettachShader();
+        void attach();
+        void dettach();
+};
+
+class Matrix4 {
+    public:
+        float e[16];  
 };
 
 class Renderer_SDL2_GLES2 : public AGL {
@@ -88,6 +111,8 @@ class Renderer_SDL2_GLES2 : public AGL {
 
         uint32_t max_elements;
         uint32_t current_elements;
+
+        drawing_state_t d_state;
     public:
         Renderer_SDL2_GLES2();
         Renderer_SDL2_GLES2(Window* window);
@@ -96,6 +121,16 @@ class Renderer_SDL2_GLES2 : public AGL {
         // Batch size
         void setBatchSize(uint32_t batch_size);
         int  getBatchSize();
+
+        // Implementation of AGL API
+
+
+
+
+
+
+
+
 
 
 
