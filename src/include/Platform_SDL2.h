@@ -136,6 +136,8 @@ class Window {
         void getPosition(int* x, int* y);
         void setPosition(int x, int y);
 
+        int getWidth();
+        int getHeight();
         // Called from the SDL2 Window event handler
         void window_handler_event(void* data);
 

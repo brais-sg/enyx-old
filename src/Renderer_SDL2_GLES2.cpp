@@ -354,11 +354,10 @@ int Renderer_SDL2_GLES2::init(){
 
     
     currentShader = NULL;
-    d_state = DRAWING_STATE_NONE;
+    d_state = DRAWING_STATE_READY;
 
     return 0;
 }
-
 
 
 void Renderer_SDL2_GLES2::setBatchSize(uint32_t batch_size){
@@ -372,3 +371,36 @@ void Renderer_SDL2_GLES2::setBatchSize(uint32_t batch_size){
     if(v4col_array) v4col_array = (float*) realloc(v4col_array, max_elements * 4 * sizeof(float));
     if(v2txc_array) v2txc_array = (float*) realloc(v2txc_array, max_elements * 2 * sizeof(float)); 
 }
+
+int Renderer_SDL2_GLES2::getBatchSize() const {
+    return max_elements;
+}
+
+int Renderer_SDL2_GLES2::getCurrentBatchSize() const {
+    return current_elements;
+}
+
+
+
+// Renderer implementation starts here
+
+void Renderer_SDL2_GLES2::viewport(int x, int y, int w, int h){
+    glViewport(x, y, w, h);
+}
+
+void Renderer_SDL2_GLES2::viewport(){
+    int wx = window->getWidth();
+    int wy = window->getHeight();
+
+    glViewport(0, 0, wx, wy);
+}
+
+void Renderer_SDL2_GLES2::scissor(int x, int y, int w, int h){
+    glScissor(x, y, w, h);
+    glEnable(GL_SCISSOR_TEST);
+}
+
+void Renderer_SDL2_GLES2::scissor(){
+    glDisable(GL_SCISSOR_TEST);
+}
+

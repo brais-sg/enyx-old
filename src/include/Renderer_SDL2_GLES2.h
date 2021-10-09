@@ -132,8 +132,11 @@ class Renderer_SDL2_GLES2 : public AGL {
         int  getCurrentBatchSize() const;
 
         // Implementation of AGL API
+        void viewport(int x, int y, int w, int h);
+        void viewport();
 
-
+        void scissor(int x, int y, int w, int h);
+        void scissor();
 
 
 

@@ -361,6 +361,18 @@ void Window::setPosition(int x, int y){
     SDL_SetWindowPosition(this->window, x, y);
 }
 
+int Window::getWidth(){
+    int width;
+    SDL_GetWindowSize(this->window, &width, NULL);
+    return width;
+}
+
+int Window::getHeight(){
+    int height;
+    SDL_GetWindowSize(this->window, NULL, &height);
+    return height;
+}
+
 void Window::window_handler_event(void* data){
     // Process WINDOW type events
     

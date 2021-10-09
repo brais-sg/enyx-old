@@ -57,8 +57,12 @@ typedef uint32_t rgba_t;
 class AGL {
     public:
         // Viewport settings
-        virtual void window(int x, int y, int w, int h) = 0;
-        virtual void window() = 0;
+        virtual void viewport(int x, int y, int w, int h) = 0;
+        virtual void viewport() = 0;
+
+        // Scissor settings
+        virtual void scissor(int x, int y, int w, int h) = 0;
+        virtual void scissor() = 0;
 
         // Coordinate transformations
         virtual void origin() = 0;
