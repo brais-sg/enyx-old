@@ -19,6 +19,8 @@
 
 #define DEFAULT_RENDERER_BATCH_SIZE 512
 
+const char* renderer_info = "OpenGL ES 2.0 on SDL2 (Enyx / Renderer build 0.1a)";
+
 enum shader_type_t {
     UNKNOWN_SHADER         = 0,
     VERTEX_SHADER          = 1,
@@ -42,6 +44,14 @@ enum drawing_state_t {
     DRAWING_STATE_LINES              = 3,
     DRAWING_STATE_TRIANGLES          = 4,
     DRAWING_STATE_TEXTURED_TRIANGLES = 5
+};
+
+enum renderer_info_t {
+    RENDERER_INFO_NONE     = 0,
+    RENDERER_INFO_BACKEND  = 1,
+    RENDERER_INFO_VENDOR   = 2,
+    RENDERER_INFO_VERSION  = 3,
+    RENDERER_INFO_GPU      = 4
 };
 
 
@@ -136,6 +146,9 @@ class Renderer_SDL2_GLES2 : public AGL {
         Renderer_SDL2_GLES2();
         Renderer_SDL2_GLES2(Window* window);
         ~Renderer_SDL2_GLES2();
+
+        // Renderer info
+        const char* getRendererInfo(renderer_info_t renderer);
 
         // init and setWindow
         void setWindow(Window* window);
