@@ -474,6 +474,7 @@ int Renderer_SDL2_GLES2::init(){
         return -1;
     }
 
+    fprintf(stderr,"[%s:%d]: INFO: Starting SDL2 OpenGL ES 2.0 Enyx renderer...\n", __FILE__, __LINE__);
     window->GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     window->GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     window->GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -492,6 +493,8 @@ int Renderer_SDL2_GLES2::init(){
 
     if(window->GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24) != 0){
         fprintf(stderr, "[%s:%d]: WARNING: init(): Cannot set 24 bits depth buffer!\n", __FILE__, __LINE__);
+        fprintf(stderr, "[%s:%d]: WARNING: init(): Setting 16 bits depth buffer instead\n", __FILE__, __LINE__);
+        window->GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
     }
     
     this->gContext = window->GL_CreateContext();
@@ -500,6 +503,13 @@ int Renderer_SDL2_GLES2::init(){
         fprintf(stderr, "%s\n", SDL_GetError());
         return -1;
     }
+
+    fprintf(stderr,"[%s:%d]: INFO: OpenGL ES 2.0 compatible context created!\n", __FILE__, __LINE__);
+    fprintf(stderr,"[%s:%d]: INFO: GL_VENDOR:                   %s\n", __FILE__, __LINE__, glGetString(GL_VENDOR));
+    fprintf(stderr,"[%s:%d]: INFO: GL_RENDERER:                 %s\n", __FILE__, __LINE__, glGetString(GL_RENDERER));
+    fprintf(stderr,"[%s:%d]: INFO: GL_VERSION:                  %s\n", __FILE__, __LINE__, glGetString(GL_VERSION));
+    fprintf(stderr,"[%s:%d]: INFO: GL_SHADING_LANGUAGE_VERSION: %s\n", __FILE__, __LINE__, glGetString(GL_SHADING_LANGUAGE_VERSION));
+
 
     window->GL_MakeCurrent(this->gContext);
 
