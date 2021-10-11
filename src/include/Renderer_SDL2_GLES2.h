@@ -18,6 +18,7 @@
 #include "AGL.h"
 
 #define DEFAULT_RENDERER_BATCH_SIZE 512
+#define DEFAULT_CIRCLE_STEPS 32
 
 enum shader_type_t {
     UNKNOWN_SHADER         = 0,
@@ -102,8 +103,13 @@ class Matrix4 {
         float e[16];  
         Matrix4();
 
+        Matrix4(const Matrix4& other);
+
         Matrix4 operator+(const Matrix4& other) const;
         Matrix4 operator*(const Matrix4& other) const;
+
+
+        Matrix4& operator=(const Matrix4& other);
         
         void loadIdentity();
         float* getArray();
@@ -136,6 +142,9 @@ class Renderer_SDL2_GLES2 : public AGL {
         int current_elements;
 
         drawing_state_t d_state;
+
+        // Circle steps
+        int circle_steps;
 
         // Shaders
         GL_Shader basicShader;
@@ -204,9 +213,26 @@ class Renderer_SDL2_GLES2 : public AGL {
         void drawRect(int x, int y, int w, int h, color_t color);
         void drawFillRect(int x, int y, int w, int h, color_t color);
 
+        void drawCircle(int x, int y, int r, color_t color);
+        void drawFillCircle(int x, int y, int r, color_t color);
+        void drawFillCircle(int x, int y, int r, color_t color1, color_t color2);
+
+        void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color);
+        void drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color);
+
+        // Classic OpenGL "Hello triangle" with colors
+        void drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color1, color_t color2, color_t color3);
+
+
+
+        // Clear operations
+        void clearColor(color_t color);
+        void clear();
+        void fillScreen(color_t color);
 
         // Submit updates to OpenGL
         void submit();
+        void render();
 
 
 };

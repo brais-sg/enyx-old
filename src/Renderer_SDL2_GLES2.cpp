@@ -235,6 +235,25 @@ Matrix4::Matrix4(){
     e[15] = 0.0f;
 }
 
+Matrix4::Matrix4(const Matrix4& other){
+    e[0]  = other.e[0];
+    e[1]  = other.e[1];
+    e[2]  = other.e[2];
+    e[3]  = other.e[3];
+    e[4]  = other.e[4];
+    e[5]  = other.e[5];
+    e[6]  = other.e[6];
+    e[7]  = other.e[7];
+    e[8]  = other.e[8];
+    e[9]  = other.e[9];
+    e[10] = other.e[10];
+    e[11] = other.e[11];
+    e[12] = other.e[12];
+    e[13] = other.e[13];
+    e[14] = other.e[14];
+    e[15] = other.e[15];
+}
+
 Matrix4 Matrix4::operator+(const Matrix4& other) const {
     Matrix4 _ret = Matrix4();
 
@@ -289,6 +308,27 @@ Matrix4 Matrix4::operator*(const Matrix4& other) const {
     _ret.e[15] = this->e[3] * other.e[12] + this->e[7] * other.e[13] + this->e[11] * other.e[14] + this->e[15] * other.e[15];
 
     return _ret;
+}
+
+Matrix4& Matrix4::operator=(const Matrix4& other){
+    e[0]  = other.e[0];
+    e[1]  = other.e[1];
+    e[2]  = other.e[2];
+    e[3]  = other.e[3];
+    e[4]  = other.e[4];
+    e[5]  = other.e[5];
+    e[6]  = other.e[6];
+    e[7]  = other.e[7];
+    e[8]  = other.e[8];
+    e[9]  = other.e[9];
+    e[10] = other.e[10];
+    e[11] = other.e[11];
+    e[12] = other.e[12];
+    e[13] = other.e[13];
+    e[14] = other.e[14];
+    e[15] = other.e[15];
+
+    return *this;
 }
 
 void Matrix4::loadIdentity(){
@@ -423,6 +463,8 @@ Renderer_SDL2_GLES2::Renderer_SDL2_GLES2(){
     max_elements     = 0;
     current_elements = 0;
 
+    circle_steps = 0;
+
     d_state = DRAWING_STATE_NONE;
 }
 
@@ -443,6 +485,8 @@ Renderer_SDL2_GLES2::Renderer_SDL2_GLES2(Window* window){
 
     max_elements     = 0;
     current_elements = 0;
+
+    circle_steps = 0;
 
     d_state = DRAWING_STATE_NONE;
 }
@@ -559,10 +603,15 @@ int Renderer_SDL2_GLES2::init(){
     memset(v3pos_array, 0, max_elements * 3 * sizeof(float));
     memset(v4col_array, 0, max_elements * 4 * sizeof(float));
     memset(v2txc_array, 0, max_elements * 2 * sizeof(float));
-
     
     currentShader = NULL;
     d_state = DRAWING_STATE_READY;
+
+    circle_steps = DEFAULT_CIRCLE_STEPS;
+
+    // Texture for character/text drawing or sprites
+
+
 
     return 0;
 }
@@ -661,6 +710,15 @@ void Renderer_SDL2_GLES2::submit(){
     }
 }
 
+void Renderer_SDL2_GLES2::render(){
+    this->submit();
+    glFlush();
+    glFinish();
+
+    // Update tick counter? FPS? Something like that?
+    // TODO: Renderer stats! Context changes per frame / Vertices per frame / Etc.
+}
+
 void Renderer_SDL2_GLES2::appendVtx(float vx, float vy, float vz){
     //if(current_elements >= max_elements) this->submit();
     size_t offset = v3pos_count * 3;
@@ -695,9 +753,18 @@ void Renderer_SDL2_GLES2::appendTxc(float u, float v){
 }
 
 void Renderer_SDL2_GLES2::bufferSpace(int space){
-    if(current_elements > (max_elements - space)){
+    if(current_elements >= (max_elements - space)){
         this->submit();
     }
+
+    if(space > max_elements){
+        // Ups. This cannot be done in a single drawing operation!
+        // Maybe I will fix this in the future (split-drawing?)
+        fprintf(stderr, "[%s:%d]: ERROR: bufferSpace(): CRITICAL: Requested %d elements for drawing but only %d are available at MAX!\n", __FILE__, __LINE__, space, max_elements);
+        // Workaround: Resize buffer to space
+        return;
+    }
+
     // Add elements to buffer
     current_elements+=space;
 }
@@ -729,7 +796,8 @@ void Renderer_SDL2_GLES2::scissor(){
 // Maybe... You can look at this later. This is a message for the future Brais.
 
 void Renderer_SDL2_GLES2::origin(){
-    // Restore transformation Matrix (Orthon)
+    this->submit();
+    // Restore transformation Matrix (Ortho)
     int wx = window->getWidth();
     int wy = window->getHeight();
     
@@ -738,6 +806,8 @@ void Renderer_SDL2_GLES2::origin(){
 }
 
 void Renderer_SDL2_GLES2::translate(float tx, float ty){
+    this->submit();
+
     Matrix4 _tm = Matrix4::translation(tx, ty);
     this->transform = this->transform * _tm;
 }
@@ -747,11 +817,15 @@ void Renderer_SDL2_GLES2::translate(int tx, int ty){
 }
 
 void Renderer_SDL2_GLES2::rotate(float angle){
+    this->submit();
+
     Matrix4 _tm = Matrix4::rotation(angle);
     this->transform = this->transform * _tm;
 }
 
 void Renderer_SDL2_GLES2::scale(float sx, float sy){
+    this->submit();
+
     Matrix4 _tm = Matrix4::scaling(sx, sy);
     this->transform = this->transform * _tm;
 }
@@ -866,7 +940,192 @@ void Renderer_SDL2_GLES2::drawRect(int x, int y, int w, int h, color_t color){
 }
 
 void Renderer_SDL2_GLES2::drawFillRect(int x, int y, int w, int h, color_t color){
+    GL_Color _c = color2rgba(color);
+
+    this->setDrawingState(DRAWING_STATE_TRIANGLES);
+    this->bufferSpace(6);
+
+    // First triangle (Anticlockwise order)
+    this->appendVtx((float) x, (float) y, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x, (float) y + h, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x + w, (float) y + h, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+    // Second triangle (Anticlockwise order)
+    this->appendVtx((float) x + w, (float) y + h, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x + w, (float) y, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x, (float) y, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+}
+
+void Renderer_SDL2_GLES2::drawCircle(int x, int y, int r, color_t color){
+    GL_Color _c = color2rgba(color);
+
+    this->setDrawingState(DRAWING_STATE_LINES);
+    this->bufferSpace(circle_steps * 2);
+
+    float angle_step = (2.f * M_PI) / (float) circle_steps;
+    float angle_now  = 0.f;
+
+    for(int i = 0; i < circle_steps; i++){
+        float px1 = (float) r * cos(angle_now);
+        float py1 = (float) r * sin(angle_now);
+
+        float px2 = (float) r * cos(angle_now + angle_step);
+        float py2 = (float) r * sin(angle_now + angle_step);
+
+        this->appendVtx(px1, py1, 0.f);
+        this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+        this->appendVtx(px2, py2, 0.f);
+        this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+        angle_now += angle_step;
+    }
+}
+
+void Renderer_SDL2_GLES2::drawFillCircle(int x, int y, int r, color_t color){
+    GL_Color _c = color2rgba(color);
+
+    this->setDrawingState(DRAWING_STATE_TRIANGLES);
+    this->bufferSpace(circle_steps * 3);
+
+    float angle_step = (2.f * M_PI) / (float) circle_steps;
+    float angle_now  = 0.f;
+
+    for(int i=0; i < circle_steps; i++){
+        float px1 = (float) r * cos(angle_now);
+        float py1 = (float) r * sin(angle_now);
+
+        float px2 = (float) r * cos(angle_now + angle_step);
+        float py2 = (float) r * sin(angle_now + angle_step);
+
+        this->appendVtx(px1, py1, 0.f);
+        this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+        this->appendVtx(px2, py2, 0.f);
+        this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+        this->appendVtx((float) x, (float) y, 0.f);
+        this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+        angle_now += angle_step;
+    }
+}
+
+void Renderer_SDL2_GLES2::drawFillCircle(int x, int y, int r, color_t color1, color_t color2){
+    GL_Color _c1 = color2rgba(color1);
+    GL_Color _c2 = color2rgba(color2);
+
+    this->setDrawingState(DRAWING_STATE_TRIANGLES);
+    this->bufferSpace(circle_steps * 3);
+
+    float angle_step = (2.f * M_PI) / (float) circle_steps;
+    float angle_now  = 0.f;
+
+    for(int i=0; i < circle_steps; i++){
+        float px1 = (float) r * cos(angle_now);
+        float py1 = (float) r * sin(angle_now);
+
+        float px2 = (float) r * cos(angle_now + angle_step);
+        float py2 = (float) r * sin(angle_now + angle_step);
+
+        this->appendVtx(px1, py1, 0.f);
+        this->appendCol(_c1.r, _c1.g, _c1.b, _c1.a);
+
+        this->appendVtx(px2, py2, 0.f);
+        this->appendCol(_c1.r, _c1.g, _c1.b, _c1.a);
+
+        this->appendVtx((float) x, (float) y, 0.f);
+        this->appendCol(_c2.r, _c2.g, _c2.b, _c2.a);
+
+        angle_now += angle_step;
+    }
+}
+
+void Renderer_SDL2_GLES2::drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color){
+    GL_Color _c = color2rgba(color);
+
+    this->setDrawingState(DRAWING_STATE_LINES);
+    this->bufferSpace(6);
+
+    // First line
+    this->appendVtx((float) x0, (float) y0, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x1, (float) y1, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+    // Second line
+    this->appendVtx((float) x1, (float) y1, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x2, (float) y2, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+    // Third line
+    this->appendVtx((float) x2, (float) y2, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x0, (float) y0, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+}
+
+void Renderer_SDL2_GLES2::drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color){
+    GL_Color _c = color2rgba(color);
+
+    this->setDrawingState(DRAWING_STATE_TRIANGLES);
+    this->bufferSpace(3);
+
+    this->appendVtx((float) x0, (float) y0, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x1, (float) y1, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x2, (float) y2, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+}
+
+void Renderer_SDL2_GLES2::drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color1, color_t color2, color_t color3){
+    GL_Color _c1 = color2rgba(color1);
+    GL_Color _c2 = color2rgba(color2);
+    GL_Color _c3 = color2rgba(color3);
+
+    this->setDrawingState(DRAWING_STATE_TRIANGLES);
+    this->bufferSpace(3);
+
+    this->appendVtx((float) x0, (float) y0, 0.f);
+    this->appendCol(_c1.r, _c1.g, _c1.b, _c1.a);
+
+    this->appendVtx((float) x1, (float) y1, 0.f);
+    this->appendCol(_c2.r, _c2.g, _c2.b, _c2.a);
+
+    this->appendVtx((float) x2, (float) y2, 0.f);
+    this->appendCol(_c3.r, _c3.g, _c3.b, _c3.a);
+}
 
 
-    
+
+
+// Clear screen methods
+void Renderer_SDL2_GLES2::clearColor(color_t color){
+    GL_Color c = color2rgba(color);
+    glClearColor(c.r, c.g, c.b, c.a);
+}
+
+
+void Renderer_SDL2_GLES2::clear(){
+    glDisable(GL_SCISSOR_TEST);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void Renderer_SDL2_GLES2::fillScreen(color_t color){
+    this->clearColor(color);
+    this->clear();
 }

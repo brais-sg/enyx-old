@@ -88,8 +88,9 @@ class AGL {
         virtual void drawCircle(int x, int y, int r, color_t color) = 0;
         virtual void drawFillCircle(int x, int y, int r, color_t color) = 0;
 
-        virtual void drawRoundRect(int x, int y, int w, int h, int r, color_t color) = 0;
-        virtual void drawFillRoundRect(int x, int y, int w, int h, int r, color_t color) = 0;
+        // Not for now boy, not for now. (Maybe next AGL revision?)
+        //virtual void drawRoundRect(int x, int y, int w, int h, int r, color_t color) = 0;
+        //virtual void drawFillRoundRect(int x, int y, int w, int h, int r, color_t color) = 0;
 
         virtual void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color) = 0;
         virtual void drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color) = 0;
