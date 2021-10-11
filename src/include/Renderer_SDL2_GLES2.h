@@ -128,12 +128,12 @@ class Renderer_SDL2_GLES2 : public AGL {
         float* v4col_array;
         float* v2txc_array;
 
-        uint32_t v3pos_count;
-        uint32_t v4col_count;
-        uint32_t v2txc_count;
+        int v3pos_count;
+        int v4col_count;
+        int v2txc_count;
 
-        uint32_t max_elements;
-        uint32_t current_elements;
+        int max_elements;
+        int current_elements;
 
         drawing_state_t d_state;
 
@@ -147,6 +147,7 @@ class Renderer_SDL2_GLES2 : public AGL {
         // Internal helper methods (Exposed for advanced usage)
         void setTransform();
         void setDrawingState(drawing_state_t drawing_mode);
+        void bufferSpace(int space);
 
         void appendVtx(float vx, float vy, float vz);
         void appendCol(float r, float g, float b, float a);
@@ -194,9 +195,14 @@ class Renderer_SDL2_GLES2 : public AGL {
 
         // DRAWING METHODS
         void drawPixel(int x, int y, color_t color);
+        void drawLine(int x0, int y0, int x1, int y1, color_t color);
+        void drawLine(int x0, int y0, int x1, int y1, color_t color1, color_t color2);
 
+        void drawFastVLine(int x0, int y0, int length, color_t color);
+        void drawFastHLine(int x0, int y0, int length, color_t color);
 
-
+        void drawRect(int x, int y, int w, int h, color_t color);
+        void drawFillRect(int x, int y, int w, int h, color_t color);
 
 
         // Submit updates to OpenGL

@@ -588,24 +588,17 @@ int Renderer_SDL2_GLES2::getCurrentBatchSize() const {
     return current_elements;
 }
 
-
 // Internal renderer methods
 void Renderer_SDL2_GLES2::setDrawingState(drawing_state_t drawing_mode){
     if(this->d_state != drawing_mode){
-        GL_Shader* mode_to_drawing[6] = {NULL, NULL, &basicShader, &basicShader, &basicShader, &textureShader};
-        // Submit actual buffer data
         this->submit();
-        if(this->currentShader){
-            currentShader->dettach();
-        }
+        this->d_state = drawing_mode;
 
-        d_state = drawing_mode;
-        this->currentShader = mode_to_drawing[d_state];
-        this->currentShader->attach();
+        this->v3pos_count = 0;
+        this->v4col_count = 0;
+        this->v2txc_count = 0;
 
-        // Done before drawing
-        //this->setTransform();
-        
+        this->current_elements = 0;
     }
 }
 
@@ -655,17 +648,59 @@ void Renderer_SDL2_GLES2::submit(){
             fprintf(stderr,"[%s:%d]: WARNING: submit(): DRAWING_STATE_TEXTURED_TRIANGLES: Not implemented\n", __FILE__, __LINE__);
         } else {
             if(d_state == DRAWING_STATE_POINTS){
+                glEnable(GL_BLEND);
                 glDrawArrays(GL_POINTS, 0, current_elements);
             } else if(d_state == DRAWING_STATE_LINES){
+                glDisable(GL_BLEND);
                 glDrawArrays(GL_LINES, 0, current_elements);
             } else if(d_state == DRAWING_STATE_TRIANGLES){
+                glEnable(GL_BLEND);
                 glDrawArrays(GL_TRIANGLES, 0, current_elements);
             }
         }
     }
 }
 
+void Renderer_SDL2_GLES2::appendVtx(float vx, float vy, float vz){
+    //if(current_elements >= max_elements) this->submit();
+    size_t offset = v3pos_count * 3;
 
+    v3pos_array[offset + 0] = vx;
+    v3pos_array[offset + 1] = vy;
+    v3pos_array[offset + 2] = vz;
+
+    v3pos_count++;
+}
+
+void Renderer_SDL2_GLES2::appendCol(float r, float g, float b, float a){
+    //if(current_elements >= max_elements) this->submit();
+    size_t offset = v4col_count * 4;
+
+    v4col_array[offset + 0] = r;
+    v4col_array[offset + 1] = g;
+    v4col_array[offset + 2] = b;
+    v4col_array[offset + 3] = a;
+
+    v4col_count++;
+}
+
+void Renderer_SDL2_GLES2::appendTxc(float u, float v){
+    //if(current_elements >= max_elements) this->submit();
+    size_t offset = v2txc_count * 2;
+
+    v2txc_array[offset + 0] = u;
+    v2txc_array[offset + 1] = v;
+
+    v2txc_count++;
+}
+
+void Renderer_SDL2_GLES2::bufferSpace(int space){
+    if(current_elements > (max_elements - space)){
+        this->submit();
+    }
+    // Add elements to buffer
+    current_elements+=space;
+}
 
 
 // Renderer implementation starts here
@@ -734,7 +769,104 @@ void Renderer_SDL2_GLES2::setTransformationMatrix(Matrix4 matrix){
 }
 
 // Renderer drawing methods
+struct GL_Color {
+    float r, g, b, a;
+};
+
+GL_Color color2rgb(uint32_t color){
+    GL_Color _color = {
+        .r = (float) R(color) / 255.f,
+        .g = (float) G(color) / 255.f,
+        .b = (float) B(color) / 255.f,
+        .a = 1.f
+    };
+
+    return _color;
+}
+
+GL_Color color2rgba(uint32_t color){
+    GL_Color _color = {
+        .r = (float) R(color) / 255.f,
+        .g = (float) G(color) / 255.f,
+        .b = (float) B(color) / 255.f,
+        .a = (float) A(color) / 255.f
+    };
+
+    return _color;
+}
+
 
 void Renderer_SDL2_GLES2::drawPixel(int x, int y, color_t color){
+    GL_Color _c = color2rgba(color);
 
+    this->setDrawingState(DRAWING_STATE_POINTS);
+    this->bufferSpace(1);
+    this->appendVtx((float) x, (float) y, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+}
+
+void Renderer_SDL2_GLES2::drawLine(int x0, int y0, int x1, int y1, color_t color){
+    GL_Color _c = color2rgba(color);
+
+    this->setDrawingState(DRAWING_STATE_LINES);
+    this->bufferSpace(2);
+    this->appendVtx((float) x0, (float) y0, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x1, (float) y1, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+}
+
+void Renderer_SDL2_GLES2::drawLine(int x0, int y0, int x1, int y1, color_t color1, color_t color2){
+    GL_Color _c1 = color2rgba(color1);
+    GL_Color _c2 = color2rgba(color2);
+
+    this->setDrawingState(DRAWING_STATE_LINES);
+    this->bufferSpace(2);
+    this->appendVtx((float) x0, (float) y0, 0.f);
+    this->appendCol(_c1.r, _c1.g, _c1.b, _c1.a);
+
+    this->appendVtx((float) x1, (float) y1, 0.f);
+    this->appendCol(_c2.r, _c2.g, _c2.b, _c2.a);
+}
+
+void Renderer_SDL2_GLES2::drawFastVLine(int x0, int y0, int length, color_t color){
+    this->drawLine(x0, y0, x0 + length, y0, color);
+}
+
+void Renderer_SDL2_GLES2::drawFastHLine(int x0, int y0, int length, color_t color){
+    this->drawLine(x0, y0, x0, y0 + length, color);
+}
+
+void Renderer_SDL2_GLES2::drawRect(int x, int y, int w, int h, color_t color){
+    GL_Color _c = color2rgba(color);
+
+    this->setDrawingState(DRAWING_STATE_LINES);
+    this->bufferSpace(8);
+
+    this->appendVtx((float) x, (float) y, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+    this->appendVtx((float) x, (float) y + h, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x, (float) y + h, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+    this->appendVtx((float) x + w, (float) y + h, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x + w, (float) y + h, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+    this->appendVtx((float) x + w, (float) y, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+
+    this->appendVtx((float) x + w, (float) y, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+    this->appendVtx((float) x, (float) y, 0.f);
+    this->appendCol(_c.r, _c.g, _c.b, _c.a);
+}
+
+void Renderer_SDL2_GLES2::drawFillRect(int x, int y, int w, int h, color_t color){
+
+
+    
 }
