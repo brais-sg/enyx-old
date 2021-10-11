@@ -156,7 +156,7 @@ class Renderer_SDL2_GLES2 : public AGL {
         // Internal helper methods (Exposed for advanced usage)
         void setTransform();
         void setDrawingState(drawing_state_t drawing_mode);
-        void bufferSpace(int space);
+        void bufferElements(int space);
 
         void appendVtx(float vx, float vy, float vz);
         void appendCol(float r, float g, float b, float a);

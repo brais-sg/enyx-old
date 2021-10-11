@@ -752,7 +752,7 @@ void Renderer_SDL2_GLES2::appendTxc(float u, float v){
     v2txc_count++;
 }
 
-void Renderer_SDL2_GLES2::bufferSpace(int space){
+void Renderer_SDL2_GLES2::bufferElements(int space){
     if(current_elements >= (max_elements - space)){
         this->submit();
     }
@@ -874,7 +874,7 @@ void Renderer_SDL2_GLES2::drawPixel(int x, int y, color_t color){
     GL_Color _c = color2rgba(color);
 
     this->setDrawingState(DRAWING_STATE_POINTS);
-    this->bufferSpace(1);
+    this->bufferElements(1);
     this->appendVtx((float) x, (float) y, 0.f);
     this->appendCol(_c.r, _c.g, _c.b, _c.a);
 }
@@ -883,7 +883,7 @@ void Renderer_SDL2_GLES2::drawLine(int x0, int y0, int x1, int y1, color_t color
     GL_Color _c = color2rgba(color);
 
     this->setDrawingState(DRAWING_STATE_LINES);
-    this->bufferSpace(2);
+    this->bufferElements(2);
     this->appendVtx((float) x0, (float) y0, 0.f);
     this->appendCol(_c.r, _c.g, _c.b, _c.a);
 
@@ -896,7 +896,7 @@ void Renderer_SDL2_GLES2::drawLine(int x0, int y0, int x1, int y1, color_t color
     GL_Color _c2 = color2rgba(color2);
 
     this->setDrawingState(DRAWING_STATE_LINES);
-    this->bufferSpace(2);
+    this->bufferElements(2);
     this->appendVtx((float) x0, (float) y0, 0.f);
     this->appendCol(_c1.r, _c1.g, _c1.b, _c1.a);
 
@@ -916,7 +916,7 @@ void Renderer_SDL2_GLES2::drawRect(int x, int y, int w, int h, color_t color){
     GL_Color _c = color2rgba(color);
 
     this->setDrawingState(DRAWING_STATE_LINES);
-    this->bufferSpace(8);
+    this->bufferElements(8);
 
     this->appendVtx((float) x, (float) y, 0.f);
     this->appendCol(_c.r, _c.g, _c.b, _c.a);
@@ -943,7 +943,7 @@ void Renderer_SDL2_GLES2::drawFillRect(int x, int y, int w, int h, color_t color
     GL_Color _c = color2rgba(color);
 
     this->setDrawingState(DRAWING_STATE_TRIANGLES);
-    this->bufferSpace(6);
+    this->bufferElements(6);
 
     // First triangle (Anticlockwise order)
     this->appendVtx((float) x, (float) y, 0.f);
@@ -969,7 +969,7 @@ void Renderer_SDL2_GLES2::drawCircle(int x, int y, int r, color_t color){
     GL_Color _c = color2rgba(color);
 
     this->setDrawingState(DRAWING_STATE_LINES);
-    this->bufferSpace(circle_steps * 2);
+    this->bufferElements(circle_steps * 2);
 
     float angle_step = (2.f * M_PI) / (float) circle_steps;
     float angle_now  = 0.f;
@@ -995,7 +995,7 @@ void Renderer_SDL2_GLES2::drawFillCircle(int x, int y, int r, color_t color){
     GL_Color _c = color2rgba(color);
 
     this->setDrawingState(DRAWING_STATE_TRIANGLES);
-    this->bufferSpace(circle_steps * 3);
+    this->bufferElements(circle_steps * 3);
 
     float angle_step = (2.f * M_PI) / (float) circle_steps;
     float angle_now  = 0.f;
@@ -1025,7 +1025,7 @@ void Renderer_SDL2_GLES2::drawFillCircle(int x, int y, int r, color_t color1, co
     GL_Color _c2 = color2rgba(color2);
 
     this->setDrawingState(DRAWING_STATE_TRIANGLES);
-    this->bufferSpace(circle_steps * 3);
+    this->bufferElements(circle_steps * 3);
 
     float angle_step = (2.f * M_PI) / (float) circle_steps;
     float angle_now  = 0.f;
@@ -1054,7 +1054,7 @@ void Renderer_SDL2_GLES2::drawTriangle(int x0, int y0, int x1, int y1, int x2, i
     GL_Color _c = color2rgba(color);
 
     this->setDrawingState(DRAWING_STATE_LINES);
-    this->bufferSpace(6);
+    this->bufferElements(6);
 
     // First line
     this->appendVtx((float) x0, (float) y0, 0.f);
@@ -1080,7 +1080,7 @@ void Renderer_SDL2_GLES2::drawFillTriangle(int x0, int y0, int x1, int y1, int x
     GL_Color _c = color2rgba(color);
 
     this->setDrawingState(DRAWING_STATE_TRIANGLES);
-    this->bufferSpace(3);
+    this->bufferElements(3);
 
     this->appendVtx((float) x0, (float) y0, 0.f);
     this->appendCol(_c.r, _c.g, _c.b, _c.a);
@@ -1098,7 +1098,7 @@ void Renderer_SDL2_GLES2::drawFillTriangle(int x0, int y0, int x1, int y1, int x
     GL_Color _c3 = color2rgba(color3);
 
     this->setDrawingState(DRAWING_STATE_TRIANGLES);
-    this->bufferSpace(3);
+    this->bufferElements(3);
 
     this->appendVtx((float) x0, (float) y0, 0.f);
     this->appendCol(_c1.r, _c1.g, _c1.b, _c1.a);
