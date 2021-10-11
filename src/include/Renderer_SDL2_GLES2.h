@@ -19,8 +19,6 @@
 
 #define DEFAULT_RENDERER_BATCH_SIZE 512
 
-const char* renderer_info = "OpenGL ES 2.0 on SDL2 (Enyx / Renderer build 0.1a)";
-
 enum shader_type_t {
     UNKNOWN_SHADER         = 0,
     VERTEX_SHADER          = 1,
@@ -110,13 +108,13 @@ class Matrix4 {
         void loadIdentity();
         float* getArray();
 
-        Matrix4 translation(float tx, float ty);
-        Matrix4 translation(float tx, float ty, float tz); // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
-        Matrix4 rotating(float angle);
-        Matrix4 scaling(float sx, float sy);
-        Matrix4 scaling(float sx, float sy, float sz); // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
+        static Matrix4 translation(float tx, float ty);
+        static Matrix4 translation(float tx, float ty, float tz); // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
+        static Matrix4 rotation(float angle);
+        static Matrix4 scaling(float sx, float sy);
+        static Matrix4 scaling(float sx, float sy, float sz); // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
 
-        Matrix4 ortho(float left, float right, float bottom, float top, float znear, float zfar);
+        static Matrix4 ortho(float left, float right, float bottom, float top, float znear, float zfar);
 };
 
 class Renderer_SDL2_GLES2 : public AGL {
@@ -142,6 +140,19 @@ class Renderer_SDL2_GLES2 : public AGL {
         // Shaders
         GL_Shader basicShader;
         GL_Shader textureShader;
+
+        // Transformation Matrix
+        Matrix4 transform;
+
+        // Internal helper methods (Exposed for advanced usage)
+        void setTransform();
+        void setDrawingState(drawing_state_t drawing_mode);
+
+        void appendVtx(float vx, float vy, float vz);
+        void appendCol(float r, float g, float b, float a);
+        void appendTxc(float u, float v);
+
+        void setShader(GL_Shader* shader);
     public:
         Renderer_SDL2_GLES2();
         Renderer_SDL2_GLES2(Window* window);
@@ -160,23 +171,36 @@ class Renderer_SDL2_GLES2 : public AGL {
         int  getCurrentBatchSize() const;
 
         // Implementation of AGL API
+
+        // Viewport
         void viewport(int x, int y, int w, int h);
         void viewport();
 
+        // Scissor
         void scissor(int x, int y, int w, int h);
         void scissor();
 
+        // Coordinate transformations
+        void origin();
+        void translate(float tx, float ty);
+        void translate(int tx, int ty);
+        void rotate(float angle);
+        void scale(float sx, float sy);
+        void scale(int sx, int sy);
+
+        // Renderer specific
+        Matrix4 getTransformationMatrix();
+        void    setTransformationMatrix(Matrix4 matrix);
+
+        // DRAWING METHODS
+        void drawPixel(int x, int y, color_t color);
 
 
 
 
 
-
-
-
-
-
-
+        // Submit updates to OpenGL
+        void submit();
 
 
 };

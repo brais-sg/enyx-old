@@ -27,6 +27,8 @@
 #include "shaders/glsl_es/basic.h"
 #include "shaders/glsl_es/texture.h"
 
+const char* renderer_info_string = "OpenGL ES 2.0 on SDL2 (Enyx / Renderer build 0.1a)";
+
 GL_Shader::GL_Shader(){
     program_id = 0; 
 
@@ -342,7 +344,7 @@ Matrix4 Matrix4::translation(float tx, float ty, float tz){
     return R;
 }
 
-Matrix4 Matrix4::rotating(float angle){
+Matrix4 Matrix4::rotation(float angle){
     Matrix4 R = Matrix4();
     R.loadIdentity();
 
@@ -587,6 +589,85 @@ int Renderer_SDL2_GLES2::getCurrentBatchSize() const {
 }
 
 
+// Internal renderer methods
+void Renderer_SDL2_GLES2::setDrawingState(drawing_state_t drawing_mode){
+    if(this->d_state != drawing_mode){
+        GL_Shader* mode_to_drawing[6] = {NULL, NULL, &basicShader, &basicShader, &basicShader, &textureShader};
+        // Submit actual buffer data
+        this->submit();
+        if(this->currentShader){
+            currentShader->dettach();
+        }
+
+        d_state = drawing_mode;
+        this->currentShader = mode_to_drawing[d_state];
+        this->currentShader->attach();
+
+        // Done before drawing
+        //this->setTransform();
+        
+    }
+}
+
+void Renderer_SDL2_GLES2::setShader(GL_Shader* shader){
+    if(currentShader) currentShader->dettach();
+    currentShader = shader;
+    currentShader->attach();
+}
+
+void Renderer_SDL2_GLES2::setTransform(){
+    if(currentShader){
+        glUniformMatrix4fv(currentShader->getTransformMatrixUniform(), 1, GL_FALSE, transform.getArray());
+    }
+}
+
+// Please! Optimize this mess
+void Renderer_SDL2_GLES2::submit(){
+    if(current_elements && (this->d_state > DRAWING_STATE_READY)){
+        // Let's go!
+        switch(d_state){
+            case DRAWING_STATE_POINTS:
+            case DRAWING_STATE_LINES:
+            case DRAWING_STATE_TRIANGLES:
+                this->setShader(&basicShader);
+                // Attribs!
+
+                glVertexAttribPointer(currentShader->getVertexAttrib(),  3, GL_FLOAT, GL_FALSE, 0, v3pos_array);
+                glVertexAttribPointer(currentShader->getColorAttrib(),   4, GL_FLOAT, GL_FALSE, 0, v4col_array);
+
+                break;
+            case DRAWING_STATE_TEXTURED_TRIANGLES:
+                this->setShader(&textureShader);
+                // Attribs
+
+                glVertexAttribPointer(currentShader->getVertexAttrib(),  3, GL_FLOAT, GL_FALSE, 0, v3pos_array);
+                glVertexAttribPointer(currentShader->getColorAttrib(),   4, GL_FLOAT, GL_FALSE, 0, v4col_array);
+                glVertexAttribPointer(currentShader->getTexcoordAttrib(),2, GL_FLOAT, GL_FALSE, 0, v2txc_array);
+
+                break;
+            default:
+                fprintf(stderr, "[%s:%d]: WARNING: Unknown drawing state in submit()!\n", __FILE__, __LINE__);
+        }
+
+        setTransform();
+        // Draw arrays
+        if(DRAWING_STATE_TEXTURED_TRIANGLES){
+            fprintf(stderr,"[%s:%d]: WARNING: submit(): DRAWING_STATE_TEXTURED_TRIANGLES: Not implemented\n", __FILE__, __LINE__);
+        } else {
+            if(d_state == DRAWING_STATE_POINTS){
+                glDrawArrays(GL_POINTS, 0, current_elements);
+            } else if(d_state == DRAWING_STATE_LINES){
+                glDrawArrays(GL_LINES, 0, current_elements);
+            } else if(d_state == DRAWING_STATE_TRIANGLES){
+                glDrawArrays(GL_TRIANGLES, 0, current_elements);
+            }
+        }
+    }
+}
+
+
+
+
 // Renderer implementation starts here
 
 void Renderer_SDL2_GLES2::viewport(int x, int y, int w, int h){
@@ -609,3 +690,51 @@ void Renderer_SDL2_GLES2::scissor(){
     glDisable(GL_SCISSOR_TEST);
 }
 
+// About this methods. Maybe is more efficient to define Matrix4 operator*=
+// Maybe... You can look at this later. This is a message for the future Brais.
+
+void Renderer_SDL2_GLES2::origin(){
+    // Restore transformation Matrix (Orthon)
+    int wx = window->getWidth();
+    int wy = window->getHeight();
+    
+    // Maybe update this in the future if the Engine will be 2.5D, but for now, it's okay
+    this->transform = Matrix4::ortho(0.f, (float) wx, (float) wy, 0.f, -1.f, 1.0f);
+}
+
+void Renderer_SDL2_GLES2::translate(float tx, float ty){
+    Matrix4 _tm = Matrix4::translation(tx, ty);
+    this->transform = this->transform * _tm;
+}
+
+void Renderer_SDL2_GLES2::translate(int tx, int ty){
+    this->translate((float) tx, (float) ty);
+}
+
+void Renderer_SDL2_GLES2::rotate(float angle){
+    Matrix4 _tm = Matrix4::rotation(angle);
+    this->transform = this->transform * _tm;
+}
+
+void Renderer_SDL2_GLES2::scale(float sx, float sy){
+    Matrix4 _tm = Matrix4::scaling(sx, sy);
+    this->transform = this->transform * _tm;
+}
+
+void Renderer_SDL2_GLES2::scale(int sx, int sy){
+    this->scale((float) sx, (float) sy);
+}
+
+Matrix4 Renderer_SDL2_GLES2::getTransformationMatrix(){
+    return this->transform;
+}
+
+void Renderer_SDL2_GLES2::setTransformationMatrix(Matrix4 matrix){
+    this->transform = matrix;
+}
+
+// Renderer drawing methods
+
+void Renderer_SDL2_GLES2::drawPixel(int x, int y, color_t color){
+
+}

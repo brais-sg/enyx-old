@@ -67,8 +67,10 @@ class AGL {
         // Coordinate transformations
         virtual void origin() = 0;
         virtual void translate(float tx, float ty) = 0;
+        virtual void translate(int tx, int ty) = 0;
         virtual void rotate(float angle) = 0;
         virtual void scale(float x, float y) = 0;
+        virtual void scale(int x, int y) = 0;
         // Get/set transformation matrix is implemented in the renderer
         // getTransformationMatrix() / setTransformationMatrix() is renderer specific
         
@@ -111,7 +113,7 @@ class AGL {
         virtual uint8_t  getPixelDepth() const = 0;
 
         // Render / submit
-        virtual void submit() = 0;  // Submit buffers to GPU in hardware-accelerated contexts
+        virtual void submit() = 0;  // Submit buffers to GPU in hardware-accelerated contexts (Also updates matrix transform!)
         virtual void render()  = 0; // Force render (waits for renderer (glFlush & glFinish on OpenGL contexts)) 
 
 

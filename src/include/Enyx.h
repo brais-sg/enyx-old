@@ -12,3 +12,5 @@
 #include "AGL.h"
 #include "Pixmap.h"
 #include "ImageDriver.h"
+#include "Platform_SDL2.h"
+#include "Renderer_SDL2_GLES2.h"
