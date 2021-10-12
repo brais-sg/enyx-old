@@ -17,9 +17,28 @@
 
 #include "Enyx.h"
 
+Window window;
+Renderer_SDL2_GLES2 agl;
+
 int main(){
     printf("Enyx begin!\n");
 
+    Events::initEventSystem();
+    window.init("Enyx main window");
+    agl.setWindow(&window);
+    if(agl.init()){
+        fprintf(stderr, "Cannot start AGL!\n");
+        return -1;
+    };
+
+
+    while(Events::isAppRunning()){
+        Events::processEvents();
+        agl.clear();
+
+
+        agl.render();
+    }
 
 
 

@@ -2,7 +2,7 @@
 # Development version
 # By Brais Solla González
 
-CC   = g++ -O0
+CC   = g++ -O0 -g
 LIBS = -lm -lSDL2 -lGLESv2
 EXEC = Enyx
 SRC  = src

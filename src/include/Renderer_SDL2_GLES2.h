@@ -223,7 +223,9 @@ class Renderer_SDL2_GLES2 : public AGL {
         // Classic OpenGL "Hello triangle" with colors
         void drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color1, color_t color2, color_t color3);
 
-
+        int getWidth()      const;
+        int getHeight()     const;
+        int getPixelDepth() const;
 
         // Clear operations
         void clearColor(color_t color);

@@ -95,13 +95,13 @@ class AGL {
         virtual void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color) = 0;
         virtual void drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color) = 0;
         
-        virtual void drawChar(int x, int y, char c, color_t color, uint8_t size) = 0;
-        virtual void drawChar(int x, int y, char c, color_t color) = 0; // Default size
+        // virtual void drawChar(int x, int y, char c, color_t color, uint8_t size) = 0;
+        // virtual void drawChar(int x, int y, char c, color_t color) = 0; // Default size
 
         // virtual void drawChar(uint16_t x, uint16_t y, char c, color_t color, color_t bg, uint8_t size);
         
-        virtual void drawText(int x, int y, const char* text, color_t color, uint8_t size) = 0;
-        virtual void drawText(int x, int y, const char* text, color_t color) = 0; // Default size
+        // virtual void drawText(int x, int y, const char* text, color_t color, uint8_t size) = 0;
+        // virtual void drawText(int x, int y, const char* text, color_t color) = 0; // Default size
 
         // Clear screen methods
         virtual void clearColor(color_t color) = 0;
@@ -109,9 +109,9 @@ class AGL {
         virtual void fillScreen(color_t color) = 0;
 
         // Screen methods
-        virtual uint16_t getWidth()      const = 0;
-        virtual uint16_t getHeight()     const = 0;
-        virtual uint8_t  getPixelDepth() const = 0;
+        virtual int getWidth()      const = 0;
+        virtual int getHeight()     const = 0;
+        virtual int getPixelDepth() const = 0;
 
         // Render / submit
         virtual void submit() = 0;  // Submit buffers to GPU in hardware-accelerated contexts (Also updates matrix transform!)

@@ -65,6 +65,9 @@ void GL_Shader::shaderSource(shader_type_t type, const char* source){
         fprintf(stderr,"[%s:%d]: WARNING: shaderSource(): Shader format not supported for OpenGL ES 2.0 context!\n", __FILE__, __LINE__);
         return;
     }
+
+    // printf("Source:\n");
+    // printf("%s\n", source);
 }
 
 int GL_Shader::compileShader(){
@@ -92,6 +95,7 @@ int GL_Shader::compileShader(){
 
     glCompileShader(fragment_shader_id);
     GLint fragment_compiled;
+    glGetShaderiv(fragment_shader_id, GL_COMPILE_STATUS, &fragment_compiled);
     if(fragment_compiled != GL_TRUE){
         GLsizei log_length = 0;
         GLchar message[2048];
@@ -609,6 +613,14 @@ int Renderer_SDL2_GLES2::init(){
 
     circle_steps = DEFAULT_CIRCLE_STEPS;
 
+    // Renderer info
+    GLint vertex_texture_units;
+    glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &vertex_texture_units);
+
+    if(vertex_texture_units == 0){
+        fprintf(stderr, "[%s:%d]: WARNING: init(): Vertex texture fetch NOT supported on this GPU!\n", __FILE__, __LINE__);
+    }
+
     // Texture for character/text drawing or sprites
 
 
@@ -643,11 +655,11 @@ void Renderer_SDL2_GLES2::setDrawingState(drawing_state_t drawing_mode){
         this->submit();
         this->d_state = drawing_mode;
 
-        this->v3pos_count = 0;
-        this->v4col_count = 0;
-        this->v2txc_count = 0;
+        // this->v3pos_count = 0;
+        // this->v4col_count = 0;
+        // this->v2txc_count = 0;
 
-        this->current_elements = 0;
+        // this->current_elements = 0;
     }
 }
 
@@ -707,6 +719,12 @@ void Renderer_SDL2_GLES2::submit(){
                 glDrawArrays(GL_TRIANGLES, 0, current_elements);
             }
         }
+
+        this->v3pos_count = 0;
+        this->v4col_count = 0;
+        this->v2txc_count = 0;
+
+        this->current_elements = 0;
     }
 }
 
@@ -715,6 +733,7 @@ void Renderer_SDL2_GLES2::render(){
     glFlush();
     glFinish();
 
+    this->window->GL_SwapWindow();
     // Update tick counter? FPS? Something like that?
     // TODO: Renderer stats! Context changes per frame / Vertices per frame / Etc.
 }
@@ -1108,6 +1127,20 @@ void Renderer_SDL2_GLES2::drawFillTriangle(int x0, int y0, int x1, int y1, int x
 
     this->appendVtx((float) x2, (float) y2, 0.f);
     this->appendCol(_c3.r, _c3.g, _c3.b, _c3.a);
+}
+
+
+
+int Renderer_SDL2_GLES2::getWidth() const {
+    return window->getWidth();
+}
+
+int Renderer_SDL2_GLES2::getHeight() const {
+    return window->getHeight();
+}
+
+int Renderer_SDL2_GLES2::getPixelDepth() const {
+    return 24;
 }
 
 
