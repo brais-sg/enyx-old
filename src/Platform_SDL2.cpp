@@ -306,6 +306,7 @@ void Window::close(){
     if(default_window) default_window = NULL;
     fprintf(stderr, "[%s:%d]: INFO: Deleting window %p\n", __FILE__, __LINE__, this);
     SDL_DestroyWindow(this->window);
+    this->window = NULL;
 }
 
 void Window::minimize(){

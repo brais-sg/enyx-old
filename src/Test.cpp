@@ -39,7 +39,7 @@ int main(){
 
         agl.drawFillRect(100,100,200,200, RGBA(255,255,255,127));
         agl.drawFillRect(80,80,240, 240, RGBA(255,127,64,64));
-        
+
 
 
 
@@ -47,7 +47,6 @@ int main(){
     }
 
 
-
-
+    window.close();
     return 0;
 }
