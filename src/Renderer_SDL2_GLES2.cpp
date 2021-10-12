@@ -630,6 +630,9 @@ int Renderer_SDL2_GLES2::init(){
         fprintf(stderr, "[%s:%d]: WARNING: init(): Vertex texture fetch NOT supported on this GPU!\n", __FILE__, __LINE__);
     }
 
+    // Blending function
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // Texture for character/text drawing or sprites
 
 

@@ -38,7 +38,7 @@ int main(){
         agl.origin();
 
         agl.drawFillRect(100,100,200,200, RGBA(255,255,255,127));
-        agl.drawFillRect(80,80,240, 240, RGBA(255,127,64,64));
+        agl.drawFillRect(120,120,160,160, RGBA(0,0,0,64));
 
 
 
