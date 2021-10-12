@@ -35,7 +35,9 @@ int main(){
     while(Events::isAppRunning()){
         Events::processEvents();
         agl.clear();
+        agl.origin();
 
+        agl.drawLine(1, 1, 100, 100, RED);
 
         agl.render();
     }

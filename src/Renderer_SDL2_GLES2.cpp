@@ -497,9 +497,18 @@ Renderer_SDL2_GLES2::Renderer_SDL2_GLES2(Window* window){
 
 
 Renderer_SDL2_GLES2::~Renderer_SDL2_GLES2(){
-    if(v3pos_array) free(v3pos_array);
-    if(v4col_array) free(v4col_array);
-    if(v2txc_array) free(v2txc_array);
+    if(v3pos_array){
+        printf("free v3pos_array\n");
+        free(v3pos_array);
+    } 
+    if(v4col_array){
+        printf("free v4col_array\n");
+        free(v4col_array);
+    }
+    if(v2txc_array){
+        printf("free v2txc_array\n");
+        free(v2txc_array);
+    }
 
     max_elements     = 0;
     current_elements = 0;
@@ -705,7 +714,7 @@ void Renderer_SDL2_GLES2::submit(){
 
         setTransform();
         // Draw arrays
-        if(DRAWING_STATE_TEXTURED_TRIANGLES){
+        if(d_state == DRAWING_STATE_TEXTURED_TRIANGLES){
             fprintf(stderr,"[%s:%d]: WARNING: submit(): DRAWING_STATE_TEXTURED_TRIANGLES: Not implemented\n", __FILE__, __LINE__);
         } else {
             if(d_state == DRAWING_STATE_POINTS){
