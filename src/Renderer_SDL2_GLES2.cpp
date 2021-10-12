@@ -1004,11 +1004,11 @@ void Renderer_SDL2_GLES2::drawCircle(int x, int y, int r, color_t color){
     float angle_now  = 0.f;
 
     for(int i = 0; i < circle_steps; i++){
-        float px1 = (float) r * cos(angle_now);
-        float py1 = (float) r * sin(angle_now);
+        float px1 = (float) x + (float) r * cos(angle_now);
+        float py1 = (float) y + (float) r * sin(angle_now);
 
-        float px2 = (float) r * cos(angle_now + angle_step);
-        float py2 = (float) r * sin(angle_now + angle_step);
+        float px2 = (float) x + (float) r * cos(angle_now + angle_step);
+        float py2 = (float) y + (float) r * sin(angle_now + angle_step);
 
         this->appendVtx(px1, py1, 0.f);
         this->appendCol(_c.r, _c.g, _c.b, _c.a);
@@ -1030,11 +1030,11 @@ void Renderer_SDL2_GLES2::drawFillCircle(int x, int y, int r, color_t color){
     float angle_now  = 0.f;
 
     for(int i=0; i < circle_steps; i++){
-        float px1 = (float) r * cos(angle_now);
-        float py1 = (float) r * sin(angle_now);
+        float px1 = (float) x + (float) r * cos(angle_now);
+        float py1 = (float) y + (float) r * sin(angle_now);
 
-        float px2 = (float) r * cos(angle_now + angle_step);
-        float py2 = (float) r * sin(angle_now + angle_step);
+        float px2 = (float) x + (float) r * cos(angle_now + angle_step);
+        float py2 = (float) y + (float) r * sin(angle_now + angle_step);
 
         this->appendVtx(px1, py1, 0.f);
         this->appendCol(_c.r, _c.g, _c.b, _c.a);
@@ -1060,11 +1060,11 @@ void Renderer_SDL2_GLES2::drawFillCircle(int x, int y, int r, color_t color1, co
     float angle_now  = 0.f;
 
     for(int i=0; i < circle_steps; i++){
-        float px1 = (float) r * cos(angle_now);
-        float py1 = (float) r * sin(angle_now);
+        float px1 = (float) x + (float) r * cos(angle_now);
+        float py1 = (float) y + (float) r * sin(angle_now);
 
-        float px2 = (float) r * cos(angle_now + angle_step);
-        float py2 = (float) r * sin(angle_now + angle_step);
+        float px2 = (float) x + (float) r * cos(angle_now + angle_step);
+        float py2 = (float) y + (float) r * sin(angle_now + angle_step);
 
         this->appendVtx(px1, py1, 0.f);
         this->appendCol(_c1.r, _c1.g, _c1.b, _c1.a);
