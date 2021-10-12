@@ -198,15 +198,15 @@ GLint GL_Shader::getTextureUnitUniform() const {
 void GL_Shader::attach(){
     glUseProgram(this->program_id);
 
-    if(vertex_attrib)   glEnableVertexAttribArray(vertex_attrib);
-    if(color_attrib)    glEnableVertexAttribArray(color_attrib);
-    if(texcoord_attrib) glEnableVertexAttribArray(texcoord_attrib);
+    if(vertex_attrib   != -1)   glEnableVertexAttribArray(vertex_attrib);
+    if(color_attrib    != -1)    glEnableVertexAttribArray(color_attrib);
+    if(texcoord_attrib != -1) glEnableVertexAttribArray(texcoord_attrib);
 }
 
 void GL_Shader::dettach(){
-    if(vertex_attrib)   glDisableVertexAttribArray(vertex_attrib);
-    if(color_attrib)    glDisableVertexAttribArray(color_attrib);
-    if(texcoord_attrib) glDisableVertexAttribArray(texcoord_attrib);
+    if(vertex_attrib   != -1)   glDisableVertexAttribArray(vertex_attrib);
+    if(color_attrib    != -1)    glDisableVertexAttribArray(color_attrib);
+    if(texcoord_attrib != -1) glDisableVertexAttribArray(texcoord_attrib);
 
     // glUseProgram(0);
 }
@@ -728,6 +728,7 @@ void Renderer_SDL2_GLES2::submit(){
                 glDrawArrays(GL_TRIANGLES, 0, current_elements);
             }
         }
+
 
         this->v3pos_count = 0;
         this->v4col_count = 0;
