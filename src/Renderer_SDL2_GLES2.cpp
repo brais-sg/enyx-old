@@ -1111,8 +1111,6 @@ void Renderer_SDL2_GLES2::drawFillTriangle(int x0, int y0, int x1, int y1, int x
 }
 
 
-
-
 // Clear screen methods
 void Renderer_SDL2_GLES2::clearColor(color_t color){
     GL_Color c = color2rgba(color);
