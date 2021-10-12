@@ -498,15 +498,15 @@ Renderer_SDL2_GLES2::Renderer_SDL2_GLES2(Window* window){
 
 Renderer_SDL2_GLES2::~Renderer_SDL2_GLES2(){
     if(v3pos_array){
-        printf("free v3pos_array\n");
+        //printf("free v3pos_array\n");
         free(v3pos_array);
     } 
     if(v4col_array){
-        printf("free v4col_array\n");
+        //printf("free v4col_array\n");
         free(v4col_array);
     }
     if(v2txc_array){
-        printf("free v2txc_array\n");
+        //printf("free v2txc_array\n");
         free(v2txc_array);
     }
 

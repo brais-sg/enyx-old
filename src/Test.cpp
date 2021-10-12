@@ -37,13 +37,9 @@ int main(){
         agl.clear();
         agl.origin();
 
-        agl.drawPixel(30, 10, BLUE);
-        agl.drawLine(1, 1, 100, 100, RED);
-        agl.drawRect(200,200,100,100, GREEN);
-        agl.drawFillRect(210, 210, 80, 80, CYAN);
-
-
-        agl.drawFillCircle(400,400, 100, GREEN, BLUE);
+        agl.drawFillRect(100,100,200,200, RGBA(255,255,255,127));
+        agl.drawFillRect(80,80,240, 240, RGBA(255,127,64,64));
+        
 
 
 
