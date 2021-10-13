@@ -294,7 +294,7 @@ Window::~Window(){
 int Window::init(const char* title){
     this->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
     if(this->window){
-        if(default_window == NULL) default_window == this;
+        if(default_window == NULL) default_window = this;
         return 0;
     } else {
         fprintf(stderr, "[%s:%d] ERROR: Cannot create Window! Error: %s\n", __FILE__,__LINE__, SDL_GetError());

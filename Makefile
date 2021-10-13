@@ -2,27 +2,24 @@
 # Development version
 # By Brais Solla González
 
-CC   = g++ -O0 -g
-LIBS = -lm -lSDL2 -lGLESv2
-EXEC = Enyx
-SRC  = src
+CC     = g++ -O0 -I./src/include
+CFLAGS = -Wall -g 
+LIBS   = -lm -lSDL2 -lGLESv2
+TARGET = Enyx
+SRC    = .../src
+OBJ    = .../obj
 
-#$(SRC)/%.o: %.cpp $(DEPS)
-#	$(CC) -c -o $@ $< $(CFLAGS) -Iinclude
-all: Pixmap.o ImageDriver.o Platform_SDL2.o Renderer_SDL2_GLES2.o Enyx
+SRCS := $(wildcard src/*.cpp)
+OBJS := $(patsubst $(SRC)/%.cpp,$(OBJ)/%.o,$(SRCS))
 
-Pixmap.o: src/Pixmap.cpp
-	$(CC) -c src/Pixmap.cpp -I./src/include/ $(LIBS)
+all: $(TARGET)
 
-ImageDriver.o: src/ImageDriver.cpp
-	$(CC) -c src/ImageDriver.cpp -I./src/include/ $(LIBS)
-Platform_SDL2.o: src/Platform_SDL2.cpp
-	$(CC) -c src/Platform_SDL2.cpp -I./src/include/ $(LIBS)
-Renderer_SDL2_GLES2.o: src/Renderer_SDL2_GLES2.cpp
-	$(CC) -c src/Renderer_SDL2_GLES2.cpp -I./src/include/ $(LIBS)
-
-Enyx: src/Test.cpp
-	$(CC) -o $(EXEC) src/Test.cpp -I./src/include *.o $(LIBS)
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+%.o: %.cpp
+	$(CC) $(CFLAGS) $(LIBS) -c $<
 
 clean:
-	rm -rf *.o $(EXEC)
+	rm -rf *.o $(TARGET)
+
+.PHONY: all clean
