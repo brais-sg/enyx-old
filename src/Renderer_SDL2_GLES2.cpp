@@ -372,7 +372,7 @@ Matrix4 Matrix4::translation(float tx, float ty){
 
     R.e[12] = tx;
     R.e[13] = ty;
-    R.e[14] = 1.f;
+    R.e[14] = 0.f;
 
     return R;
 }
@@ -407,8 +407,9 @@ Matrix4 Matrix4::scaling(float sx, float sy){
     Matrix4 R = Matrix4();
     R.loadIdentity();
 
-    R.e[0] = sx;
-    R.e[5] = sy;
+    R.e[0]  = sx;
+    R.e[5]  = sy;
+    R.e[10] = 1.f;
 
     return R;
 }
