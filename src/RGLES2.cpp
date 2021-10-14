@@ -361,6 +361,8 @@ RMatrix4 RMatrix4::operator*(float scalar) const {
     ret.e[13] = this->e[13] * scalar;
     ret.e[14] = this->e[14] * scalar;
     ret.e[15] = this->e[15] * scalar;
+
+    return ret;
 }
 
 RMatrix4& RMatrix4::operator+=(const RMatrix4& other){
