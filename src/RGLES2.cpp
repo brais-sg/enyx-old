@@ -33,6 +33,10 @@
 #define sq(x) (((x)*(x)))
 #endif
 
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
+
 // Base class
 
 // RVector2i implementation
@@ -768,6 +772,19 @@ void RShader::dettach() const {
     if(this->texcoord_attrib != -1) glDisableVertexAttribArray(this->texcoord_attrib);
 }
 
+// Just before pipelines, global rendering stats struct
+static rperfstats_t perfstats;
+
+static void zeroBufferElements(void* buffer){
+    rbufferheader_t* header = (rbufferheader_t*) buffer;
+
+    header->elements = 0;
+
+    header->vtx_count = 0;
+    header->clr_count = 0;
+    header->txc_count = 0;
+}
+
 // IMPLEMENTING PIPELINES!
 RDotPipeline::RDotPipeline(){
     // Compile internal shader
@@ -775,13 +792,40 @@ RDotPipeline::RDotPipeline(){
 }
 
 void RDotPipeline::enable(){
-
+    this->internalShader.attach();
+    // Disable some OpenGL states. We do NOT need blending in point rendering pipeline
+    glDisable(GL_BLEND); 
+    // Track number of context changes
+    perfstats.context_changes++;
 }
 
 void RDotPipeline::disable(){
-
+    this->internalShader.dettach();
 }
 
 void RDotPipeline::draw(void* buffer){
-    
+    // Shader is currently attached via enable(). Only set the pointers and drawArrays
+    // Also, update perfstats
+    rbufferheader_t* header = (rbufferheader_t*) buffer;
+    intptr_t buffer_base    = (intptr_t) header + RBUFFERHEADER_SIZE;
+
+    void* vtxaddr = (void*) (buffer_base + header->vtx_offset);
+    void* clraddr = (void*) (buffer_base + header->clr_offset);
+
+    uint32_t element_count = header->elements;
+
+    // Set OpenGL ES attrib pointers
+    glVertexAttribPointer(this->internalShader.getVertexAttrib(), 3, GL_FLOAT, GL_FALSE, 0, vtxaddr);
+    glVertexAttribPointer(this->internalShader.getColorAttrib(),  4, GL_FLOAT, GL_FALSE, 0, clraddr);
+
+    // Draw arrays!
+    glDrawArrays(GL_POINTS, 0, element_count);
+
+    // Update performance counter struct and reset current elements in header
+    perfstats.buffer_max_elements_used = max(perfstats.buffer_max_elements_used, element_count);
+    perfstats.bytes_transfered        += (element_count * 3 * sizeof(float)) + (element_count * 4 * sizeof(float));
+    perfstats.vertices_drawn          += element_count;
+    // Zero elements in buffer and positions
+    zeroBufferElements(buffer);
 }
+

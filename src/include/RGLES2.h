@@ -282,6 +282,9 @@ class RGLES2 {
         // Internal methods
         // Switch pipeline: Only if new pipeline is different to the new pipeline
         void setPipeline(RPipeline* pipeline);
+
+        // Zero performance stats counter. Call every frame!
+        void zeroPerfstats();
     public:
         RGLES2();
         ~RGLES2();
