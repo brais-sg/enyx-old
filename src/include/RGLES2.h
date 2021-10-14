@@ -100,12 +100,19 @@ class RMatrix4 {
         void   loadIdentity();
 
         static RMatrix4 translation(float tx, float ty);
-        static RMatrix4 translation(float tx, float ty, float tz); // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
+
+        // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
+        static RMatrix4 translation(float tx, float ty, float tz);
         static RMatrix4 rotation(float angle);
         static RMatrix4 scaling(float sx, float sy);
-        static RMatrix4 scaling(float sx, float sy, float sz); // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
+
+        // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
+        static RMatrix4 scaling(float sx, float sy, float sz); 
 
         static RMatrix4 ortho(float left, float right, float bottom, float top, float znear, float zfar);
+
+        // This is not going to be a 3D engine, right?
+        static RMatrix4 frustum(float left, float right, float bottom, float top, float znear, float zfar);
 };
 
 // Renderer base structs
@@ -127,19 +134,54 @@ typedef struct {
 
 // Performance counter struct
 struct rperfstats_t {
+    // Total vertices drawn (only vertices, not color / texture) per frame operation
+    uint32_t vertices_drawn;
+    // Total context changes operations
+    uint32_t context_changes;
+    // Number of auxiliary buffers used in this frame
+    uint32_t auxiliary_buffers_used;
+    // Maximum buffer usage in elements!
+    uint32_t buffer_max_elements_used;
+    // Total bytes transfered via glAttibPointer / glTexImage2D operation
+    uint32_t bytes_transfered;
+    // Total time usage for the draw operation (newTime - lastTime)
+    uint32_t time_ms;
     // ...
 };
+
+// Struct for buffer header
+struct rbufferheader_t {
+    // Buffer size in bytes (Without header)
+    uint32_t buffer_size;
+    // Buffer size in elements
+    uint32_t buffer_max_elements;
+
+    // Number of elements (glDrawArrays)
+    uint32_t elements;
+    // Current vertex, color and texcoord elements count (One vtx element = 3 floats (vertex3_t))
+    uint32_t vtx_count;
+    uint32_t clr_count;
+    uint32_t txc_count;
+    // Buffer offsets counting from base + RBUFFERHEADER_SIZE
+    intptr_t vtx_offset;
+    intptr_t clr_offset;
+    intptr_t txc_offset;
+    // flags? / textures? / parameters?
+};
+
+#define RBUFFERHEADER_SIZE sizeof(rbufferheader_t)
 
 // Shader class
 class RShader {
     private:
-        GLint programId;
+        GLuint programId;
 
+        GLint vertex_attrib;
         GLint color_attrib;
         GLint texcoord_attrib;
 
         GLint tmtrx_uniform;
-        GLint textureunit_uniform;
+        GLint tex0_uniform;
     public:
         RShader();
         ~RShader();
@@ -148,7 +190,7 @@ class RShader {
         int init(const char* vertexSource, const char* fragSource);
 
         GLint getUniformLocation(const char* uniform);
-        GLint getAttribLocation(const char* attribute);
+        GLint getAttribLocation(const char* attrib);
 
         GLint getVertexAttrib()   const;
         GLint getColorAttrib()    const;
@@ -160,6 +202,17 @@ class RShader {
         // Attach, dettach (Enable / Disable attributes and glUseProgram)
         void attach()  const;
         void dettach() const;
+};
+
+
+class RPipeline {
+    public:
+        // Enable rendering pipeline (Only on context change)
+        virtual void enable()  = 0;
+        // Disable rendering pipeline (Only on context change)
+        virtual void disable() = 0;
+        // Draw method (Receives pointer to auxiliary buffer)
+        virtual void draw(void* buffer) = 0;
 };
 
 #endif

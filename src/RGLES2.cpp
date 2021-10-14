@@ -23,6 +23,7 @@
 
 #include "AGL.h"
 #include "RGLES2.h"
+#include "Debug.h"
 
 #ifndef sq
 #define sq(x) (((x)*(x)))
@@ -548,3 +549,217 @@ RMatrix4 RMatrix4::scaling(float sx, float sy, float sz){
     return ret;
 }
 
+RMatrix4 RMatrix4::ortho(float left, float right, float bottom, float top, float znear, float zfar){
+    RMatrix4 ret = RMatrix4();
+    // ret.loadIdentity(); // Not needed! Optimized
+
+    ret.e[0]  = 2.f / (right - left);
+    ret.e[5]  = 2.f / (top - bottom);
+    ret.e[10] = 2.f / (zfar - znear);
+
+    // Translate vector
+    ret.e[12] = -(right + left) / (right - left);
+    ret.e[13] = -(top + bottom) / (top - bottom);
+    ret.e[14] = -(zfar + znear) / (zfar - znear);
+    ret.e[15] = 1.f;
+
+    return ret;
+}
+
+RMatrix4 RMatrix4::frustum(float left, float right, float bottom, float top, float znear, float zfar){
+    RMatrix4 ret = RMatrix4();
+    // ret.loadIdentity(); // Not needed! Optimized
+
+    ret.e[0]  = (2.f * znear) / (right - left);
+    ret.e[5]  = (2.f * znear) / (top - bottom);
+
+    ret.e[8]  = (right + left)  / (right - left);
+    ret.e[9]  = (top + bottom)  / (top - bottom);
+    ret.e[10] = -(zfar + znear) / (zfar - znear);
+    ret.e[11] = -1.f;
+
+    ret.e[14] = -(2.f * zfar * znear) / (zfar - znear);
+    
+    return ret;
+}
+
+// STEP 2: Implement base structs: In the header
+// STEP 3: Implement shader class
+
+RShader::RShader(){
+    this->programId = 0;
+
+    this->vertex_attrib   = -1;
+    this->color_attrib    = -1;
+    this->texcoord_attrib = -1;
+
+    this->tmtrx_uniform       = -1;
+    this->tex0_uniform        = -1;
+}
+
+RShader::~RShader(){
+    if(this->programId){
+        Debug::info("[%s:%d]: Deleting OpenGL program %d\n", __FILE__, __LINE__, (int) this->programId);
+        glDeleteProgram(this->programId);
+    } else {
+        Debug::info("[%s:%d]: Deleting non initialized OpenGL program\n", __FILE__, __LINE__);
+    }
+
+    this->programId = 0;
+}
+
+RShader::RShader(const char* vertexSource, const char* fragSource){
+    this->programId = 0;
+
+    this->vertex_attrib   = -1;
+    this->color_attrib    = -1;
+    this->texcoord_attrib = -1;
+
+    this->tmtrx_uniform       = -1;
+    this->tex0_uniform        = -1;
+
+    if(this->init(vertexSource, fragSource)){
+        Debug::error("[%s:%d]: Shader program creation error in RShader constructor!\n", __FILE__, __LINE__);
+    }
+}
+
+int RShader::init(const char* vertexSource, const char* fragSource){
+    GLuint vert, frag;
+
+    vert = glCreateShader(GL_VERTEX_SHADER);
+    frag = glCreateShader(GL_FRAGMENT_SHADER);
+
+    if(vert == 0 || frag == 0){
+        Debug::error("[%s:%d]: Cannot create vertex or fragment shader object!\n", __FILE__, __LINE__);
+        return -1;
+    }
+
+    glShaderSource(vert, 1, &vertexSource, NULL);
+    glShaderSource(frag, 1, &fragSource,   NULL);
+
+    // Compile vertex shader
+    glCompileShader(vert);
+
+    GLint vertex_compiled;
+    glGetShaderiv(vert, GL_COMPILE_STATUS, &vertex_compiled);
+    if(vertex_compiled != GL_TRUE){
+        GLsizei log_length = 0;
+        GLchar message[2048];
+        glGetShaderInfoLog(vert, 2048, &log_length, message);
+
+        Debug::error("[%s:%d]: Vertex shader compiler error!\n", __FILE__, __LINE__);
+        Debug::error("%s\n", message);
+        return -2;
+    }
+
+    // Compile fragment shader
+    glCompileShader(frag);
+
+    GLint fragment_compiled;
+    glGetShaderiv(frag, GL_COMPILE_STATUS, &fragment_compiled);
+    if(fragment_compiled != GL_TRUE){
+        GLsizei log_length = 0;
+        GLchar message[2048];
+        glGetShaderInfoLog(frag, 2048, &log_length, message);
+        Debug::error("[%s:%d]: Fragment shader compiler error!\n", __FILE__, __LINE__);
+        Debug::error("%s\n", message);
+        return -3;
+    }
+
+    // Prepare for linkage
+    if(this->programId){
+        Debug::warning("[%s:%d]: programId already exists (%d), removing and linking new shader...\n", __FILE__, __LINE__, (int) this->programId);
+        glDeleteProgram(this->programId);
+    }
+
+    this->programId = glCreateProgram();
+    if(this->programId == 0){
+        Debug::error("[%s:%d]: Cannot create the program object!\n", __FILE__, __LINE__);
+        return -4;
+    }
+
+    // Attrib location for program
+    glBindAttribLocation(this->programId, 0, "a_vertex");
+    glBindAttribLocation(this->programId, 1, "a_color");
+    glBindAttribLocation(this->programId, 2, "a_vtxcoord");
+
+    // Attach and link shader
+    glAttachShader(this->programId, vert);
+    glAttachShader(this->programId, frag);
+
+    glLinkProgram(this->programId);
+
+    // Linkage info
+    GLint program_linked;
+    glGetProgramiv(this->programId, GL_LINK_STATUS, &program_linked);
+    if (program_linked != GL_TRUE){
+        GLsizei log_length = 0;
+        GLchar message[2048];
+        glGetProgramInfoLog(this->programId, 2048, &log_length, message);
+        Debug::error("[%s:%d]: Shader linkage error!\n", __FILE__, __LINE__);
+        Debug::error("%s\n", message);
+        return -5;
+    }
+
+    // Get location for vertex attribs / uniforms
+    // Do not trust the driver with vertex attribs!
+    this->vertex_attrib        = this->getAttribLocation("a_vertex");
+    this->color_attrib         = this->getAttribLocation("a_color");
+    this->texcoord_attrib      = this->getAttribLocation("a_vtxcoord");
+
+    this->tmtrx_uniform        = this->getUniformLocation("u_tmtrx");
+    this->tex0_uniform         = this->getUniformLocation("u_textureunit");
+
+    // Warnings for missing texmatrix!
+    if(this->tmtrx_uniform == -1){
+        Debug::warning("[%s:%d]: Shader %d is missing a transformation matrix uniform!\n", __FILE__, __LINE__, (int) this->programId);
+    }
+
+    // Free shaders
+    glDeleteShader(vert);
+    glDeleteShader(frag);
+
+    return 0;
+}
+
+GLint RShader::getUniformLocation(const char* uniform){
+    return glGetUniformLocation(this->programId, uniform);
+}
+
+GLint RShader::getAttribLocation(const char* attrib){
+    return glGetAttribLocation(this->programId, attrib);
+}
+
+GLint RShader::getVertexAttrib() const {
+    return this->vertex_attrib;
+}
+
+GLint RShader::getColorAttrib() const {
+    return this->color_attrib;
+}
+
+GLint RShader::getTexcoordAttrib() const {
+    return this->texcoord_attrib;
+}
+
+GLint RShader::getTransformMatrixUniform() const {
+    return this->tmtrx_uniform;
+}
+
+GLint RShader::getTextureUnitUniform() const {
+    return this->tex0_uniform;
+}
+
+void RShader::attach() const {
+    glUseProgram(this->programId);
+
+    if(this->vertex_attrib != -1)   glEnableVertexAttribArray(this->vertex_attrib);
+    if(this->color_attrib  != -1)   glEnableVertexAttribArray(this->color_attrib);
+    if(this->texcoord_attrib != -1) glEnableVertexAttribArray(this->texcoord_attrib);
+}
+
+void RShader::dettach() const {
+    if(this->vertex_attrib != -1)   glDisableVertexAttribArray(this->vertex_attrib);
+    if(this->color_attrib  != -1)   glDisableVertexAttribArray(this->color_attrib);
+    if(this->texcoord_attrib != -1) glDisableVertexAttribArray(this->texcoord_attrib);
+}
