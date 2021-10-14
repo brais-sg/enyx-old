@@ -25,6 +25,10 @@
 #include "RGLES2.h"
 #include "Debug.h"
 
+// Internal shaders
+#include "shaders/glsl_es/basic.h"
+#include "shaders/glsl_es/texture.h"
+
 #ifndef sq
 #define sq(x) (((x)*(x)))
 #endif
@@ -762,4 +766,22 @@ void RShader::dettach() const {
     if(this->vertex_attrib != -1)   glDisableVertexAttribArray(this->vertex_attrib);
     if(this->color_attrib  != -1)   glDisableVertexAttribArray(this->color_attrib);
     if(this->texcoord_attrib != -1) glDisableVertexAttribArray(this->texcoord_attrib);
+}
+
+// IMPLEMENTING PIPELINES!
+RDotPipeline::RDotPipeline(){
+    // Compile internal shader
+    this->internalShader = RShader(basic_vert, basic_frag);
+}
+
+void RDotPipeline::enable(){
+
+}
+
+void RDotPipeline::disable(){
+
+}
+
+void RDotPipeline::draw(void* buffer){
+    
 }
