@@ -887,11 +887,11 @@ void RTrianglePipeline::enable(){
     perfstats.context_changes++;
 }
 
-void RLinePipeline::disable(){
+void RTrianglePipeline::disable(){
     this->internalShader.dettach();
 }
 
-void RLinePipeline::draw(void* buffer){
+void RTrianglePipeline::draw(void* buffer){
     rbufferheader_t* header = (rbufferheader_t*) buffer;
     intptr_t buffer_base    = (intptr_t) header + RBUFFERHEADER_SIZE;
 
