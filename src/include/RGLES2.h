@@ -135,6 +135,8 @@ typedef struct {
 // Performance counter struct
 // This should be a global struct accesible from the rendering pipelines
 struct rperfstats_t {
+    // Total number of drawcalls
+    uint32_t drawcalls;
     // Total vertices drawn (only vertices, not color / texture) per frame operation
     uint32_t vertices_drawn;
     // Total context changes operations
