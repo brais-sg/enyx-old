@@ -133,6 +133,7 @@ typedef struct {
 } __attribute__((packed)) texcrd3_t;
 
 // Performance counter struct
+// This should be a global struct accesible from the rendering pipelines
 struct rperfstats_t {
     // Total vertices drawn (only vertices, not color / texture) per frame operation
     uint32_t vertices_drawn;
@@ -213,6 +214,100 @@ class RPipeline {
         virtual void disable() = 0;
         // Draw method (Receives pointer to auxiliary buffer)
         virtual void draw(void* buffer) = 0;
+};
+
+
+class RDotPipeline : public RPipeline {
+    private:
+        RShader internalShader;
+    public:
+        RDotPipeline();
+        ~RDotPipeline();
+
+        void enable();
+        void disable();
+        void draw(void* buffer);
+};
+
+class RLinePipeline : public RPipeline {
+    private:
+        RShader internalShader;
+    public:
+        RLinePipeline();
+        ~RLinePipeline();
+
+        void enable();
+        void disable();
+        void draw(void* buffer);
+};
+
+class RTrianglePipeline : public RPipeline {
+    private:
+        RShader internalShader;
+    public:
+        RTrianglePipeline();
+        ~RTrianglePipeline();
+
+        void enable();
+        void disable();
+        void draw(void* buffer);
+};
+
+class RTexturePipeline : public RPipeline {
+    private:
+        RShader internalShader;
+    public:
+        RTexturePipeline();
+        ~RTexturePipeline();
+
+        void enable();
+        void disable();
+        void draw(void* buffer);
+};
+
+// ...
+
+// class RGLES2 : public AGL {
+class RGLES2 {
+    private:
+        // Internal variables and methods
+        Window*       baseWindow;
+        SDL_GLContext gContext;
+
+        // Rendering buffer, DO NOT CONFUSE WITH AN OpenGL RenderBuffer
+        void* drawBuffer;
+
+        RPipeline* currentRPipeline;
+
+        // Internal methods
+        // Switch pipeline: Only if new pipeline is different to the new pipeline
+        void setPipeline(RPipeline* pipeline);
+    public:
+        RGLES2();
+        ~RGLES2();
+        // Set Window and start renderer
+        void setWindow(Window* window);
+
+        /**
+         * @brief Starts the RGLES2 renderer.
+         * 
+         * @return int Returns zero on sucess, other on error
+         */
+        int  init();
+
+        /**
+         * @brief Ends the RGLES2 renderer. Called automatically from the destructor
+         * 
+         * @return int Returns zero on sucess
+         */
+        int destroy();
+
+        // ...
+
+
+
+
+
 };
 
 #endif

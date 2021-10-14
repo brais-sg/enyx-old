@@ -37,9 +37,14 @@ int main(){
         agl.clear();
         agl.origin();
 
-        agl.drawFillRect(100,100,200,200, RGBA(255,255,255,127));
-        agl.drawFillRect(120,120,160,160, RGBA(0,0,0,64));
+        //agl.drawFillRect(100,100,200,200, RGBA(255,255,255,127));
+        //agl.drawFillRect(120,120,160,160, RGBA(0,0,0,64));
 
+        agl.drawFillRect(0,0, 800, 600, GREEN);
+        
+        agl.scissor(200,600-200,50,50);
+        agl.drawFillTriangle(200, 200, 100, 400, 300, 400, RED, GREEN, BLUE);
+        agl.scissor();
 
 
 
