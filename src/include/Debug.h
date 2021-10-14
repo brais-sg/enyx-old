@@ -1,10 +1,6 @@
 #ifndef _DEBUG_INCLUDED
 #define _DEBUG_INCLUDED
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdarg.h>
-
 
 namespace Debug {
     void info   (const char* format, ...);
