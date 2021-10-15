@@ -17,6 +17,10 @@
 #include "Platform_SDL2.h"
 #include <GLES2/gl2.h>
 
+#ifndef _BV
+#define _BV(x) ((1) << (x))
+#endif
+
 // Renderer base classes definition
 class RVector2i {
     public:
@@ -152,6 +156,11 @@ struct rperfstats_t {
     // ...
 };
 
+// Enum for buffer header flags
+enum rbufferheader_flags {
+    FLAG_NONE     = 0,
+    FLAG_TEMPORAL = _BV(0)
+};
 // Struct for buffer header
 struct rbufferheader_t {
     // Buffer size in bytes (Without header)
@@ -170,6 +179,7 @@ struct rbufferheader_t {
     intptr_t clr_offset;
     intptr_t txc_offset;
     // flags? / textures? / parameters?
+    uint32_t flags;
 };
 
 #define RBUFFERHEADER_SIZE sizeof(rbufferheader_t)
