@@ -1044,7 +1044,31 @@ int RGLES2::init(){
     Debug::info("[%s:%d]: VERSION         : %s\n",__FILE__, __LINE__,glGetString(GL_VERSION));
     Debug::info("[%s:%d]: SHADING VERSION : %s\n",__FILE__, __LINE__,glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    
+    // Fill renderer info struct
+    glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS,     &this->gles2_info.MAX_FRAGMENT_UNIFORM_VECTORS);
+    glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS,       &this->gles2_info.MAX_VERTEX_UNIFORM_VECTORS);
+    glGetIntegerv(GL_MAX_VARYING_VECTORS,              &this->gles2_info.MAX_VARYING_VECTORS);
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS,               &this->gles2_info.MAX_VERTEX_ATTRIBS);
+    glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE,            &this->gles2_info.MAX_RENDERBUFFER_SIZE);
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS,          &this->gles2_info.MAX_TEXTURE_IMAGE_UNITS);
+    glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &this->gles2_info.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+    glGetIntegerv(GL_MAX_CUBE_MAP_TEXTURE_SIZE,        &this->gles2_info.MAX_CUBE_MAP_TEXTURE_SIZE);
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE,                 &this->gles2_info.MAX_TEXTURE_SIZE);
+    glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS,   &this->gles2_info.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+
+    GLint viewport_dims[2];
+    glGetIntegerv(GL_MAX_VIEWPORT_DIMS, viewport_dims);
+    this->gles2_info.MAX_VIEWPORT_DIMS_WIDTH  = viewport_dims[0];
+    this->gles2_info.MAX_VIEWPORT_DIMS_HEIGHT = viewport_dims[1];
+
+    // Warning on vertex texture fetch (VTF)
+    if(this->gles2_info.MAX_VERTEX_TEXTURE_IMAGE_UNITS == 0){
+        Debug::warning("[%s:%d]: Vertex texture fetch (VTX) is NOT supported on this GPU!\n", __FILE__, __LINE__);
+    }
+
+    // Show info about the struct
+    // TODO
+
 
 
 
