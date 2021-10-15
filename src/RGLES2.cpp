@@ -293,6 +293,8 @@ RMatrix4 RMatrix4::operator+(const RMatrix4& other) const {
     ret.e[13] = this->e[13] + other.e[13];
     ret.e[14] = this->e[14] + other.e[14];
     ret.e[15] = this->e[15] + other.e[15];
+
+    return ret;
 }
 
 RMatrix4 RMatrix4::operator-(const RMatrix4& other) const {
@@ -314,6 +316,8 @@ RMatrix4 RMatrix4::operator-(const RMatrix4& other) const {
     ret.e[13] = this->e[13] - other.e[13];
     ret.e[14] = this->e[14] - other.e[14];
     ret.e[15] = this->e[15] - other.e[15];
+
+    return ret;
 }
 
 RMatrix4 RMatrix4::operator*(const RMatrix4& other) const {
@@ -806,6 +810,10 @@ void RDotPipeline::disable(){
     this->internalShader.dettach();
 }
 
+void RDotPipeline::setTransform(RMatrix4& matrix){
+    glUniformMatrix4fv(this->internalShader.getTransformMatrixUniform(), 1, GL_FALSE, matrix.getArray());
+}
+
 void RDotPipeline::draw(void* buffer){
     // Shader is currently attached via enable(). Only set the pointers and drawArrays
     // Also, update perfstats
@@ -848,6 +856,10 @@ void RLinePipeline::enable(){
 
 void RLinePipeline::disable(){
     this->internalShader.dettach();
+}
+
+void RLinePipeline::setTransform(RMatrix4& matrix){
+    glUniformMatrix4fv(this->internalShader.getTransformMatrixUniform(), 1, GL_FALSE, matrix.getArray());
 }
 
 void RLinePipeline::draw(void* buffer){
@@ -893,6 +905,10 @@ void RTrianglePipeline::disable(){
     this->internalShader.dettach();
 }
 
+void RTrianglePipeline::setTransform(RMatrix4& matrix){
+    glUniformMatrix4fv(this->internalShader.getTransformMatrixUniform(), 1, GL_FALSE, matrix.getArray());
+}
+
 void RTrianglePipeline::draw(void* buffer){
     rbufferheader_t* header = (rbufferheader_t*) buffer;
     intptr_t buffer_base    = (intptr_t) header + RBUFFERHEADER_SIZE;
@@ -918,5 +934,4 @@ void RTrianglePipeline::draw(void* buffer){
     zeroBufferElements(buffer);
 }
 
-// TODO. Set transformation matrix on pipeline enable!
 // TODO. Set texture uniforms on texture pipeline enable!

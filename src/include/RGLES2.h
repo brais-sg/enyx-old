@@ -216,6 +216,8 @@ class RPipeline {
         virtual void disable() = 0;
         // Draw method (Receives pointer to auxiliary buffer)
         virtual void draw(void* buffer) = 0;
+        // Set uniforms!
+        virtual void setTransform(RMatrix4& matrix);
 };
 
 
@@ -228,6 +230,7 @@ class RDotPipeline : public RPipeline {
 
         void enable();
         void disable();
+        void setTransform(RMatrix4& matrix);
         void draw(void* buffer);
 };
 
@@ -240,6 +243,7 @@ class RLinePipeline : public RPipeline {
 
         void enable();
         void disable();
+        void setTransform(RMatrix4& matrix);
         void draw(void* buffer);
 };
 
@@ -252,6 +256,7 @@ class RTrianglePipeline : public RPipeline {
 
         void enable();
         void disable();
+        void setTransform(RMatrix4& matrix);
         void draw(void* buffer);
 };
 
@@ -264,6 +269,7 @@ class RTexturePipeline : public RPipeline {
 
         void enable();
         void disable();
+        void setTransform(RMatrix4& matrix);
         void draw(void* buffer);
 };
 
