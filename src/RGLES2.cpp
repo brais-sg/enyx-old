@@ -998,8 +998,53 @@ int RGLES2::setMaxBufferElements(uint32_t buffer_elements){
 }
 
 int RGLES2::init(){
-    Debug::info("[%s:%d]: Staring RGLES2 rendering backend for Enyx!\n",__FILE__,__LINE__);
+    Debug::info("[%s:%d]: Starting RGLES2 rendering backend for Enyx!\n",__FILE__,__LINE__);
 
+    if(this->baseWindow == NULL){
+        Debug::error("[%s:%d]: Cannot start renderer because baseWindow is NOT set!\n", __FILE__, __LINE__);
+        return -1;
+    }
+
+    this->baseWindow->GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    this->baseWindow->GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    this->baseWindow->GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    Debug::info("[%s:%d]: Attributes for OpenGL ES 2.0 compatible context set\n", __FILE__, __LINE__);
+
+    if(this->baseWindow->GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) != 0){
+        Debug::warning("[%s:%d]: Cannot enable double buffer!\n", __FILE__, __LINE__);
+    }
+
+    if(this->baseWindow->GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24) != 0){
+        Debug::warning("[%s:%d]: Cannot set 24 bits depth buffer!\n", __FILE__, __LINE__);
+        Debug::warning("[%s:%d]: Setting 16 bits depth buffer instead\n", __FILE__, __LINE__);
+        this->baseWindow->GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+    }
+
+    this->gContext = this->baseWindow->GL_CreateContext();
+    if(this->gContext == NULL){
+        Debug::error("[%s:%d]: Cannot start OpenGL ES 2.0 compatible context!\n", __FILE__, __LINE__);
+        Debug::error("[%s:%d]: SDL2 error: %s\n", __FILE__, __LINE__, SDL_GetError());
+        return -2;
+    }
+
+    // Context is initialized! Set VSYNC NOW! 
+    if(this->baseWindow->GL_SetSwapInterval(-1) != 0){
+        Debug::warning("[%s:%d]: Adaptative sync set failed! Trying VSync = on...\n", __FILE__, __LINE__);
+        if(this->baseWindow->GL_SetSwapInterval(1) != 0){
+            Debug::warning("[%s:%d]: Cannot enable Vsync! Leaving VSync disabled\n", __FILE__, __LINE__);
+            this->baseWindow->GL_SetSwapInterval(0);
+        }
+    }
+
+    // Get renderer info now!
+    Debug::info("[%s:%d]: OpenGL ES 2.0 compatible context created!\n",__FILE__, __LINE__);
+    
+    Debug::info("[%s:%d]: VENDOR          : %s\n",__FILE__, __LINE__,glGetString(GL_VENDOR));
+    Debug::info("[%s:%d]: RENDERER        : %s\n",__FILE__, __LINE__,glGetString(GL_RENDERER));
+    Debug::info("[%s:%d]: VERSION         : %s\n",__FILE__, __LINE__,glGetString(GL_VERSION));
+    Debug::info("[%s:%d]: SHADING VERSION : %s\n",__FILE__, __LINE__,glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+    
 
 
 

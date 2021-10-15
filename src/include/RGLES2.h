@@ -327,6 +327,9 @@ class RGLES2 {
         RLinePipeline*     linePipeline;
         RTrianglePipeline* trianglePipeline;
 
+
+        // Renderer info struct 
+        rgles2info_t gles2_info;
         // Internal methods
         // Switch pipeline: Only if new pipeline is different to the new pipeline
         void setPipeline(RPipeline* pipeline);
