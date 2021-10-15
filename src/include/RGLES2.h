@@ -21,6 +21,12 @@
 #define _BV(x) ((1) << (x))
 #endif
 
+#define DEFAULT_DRAW_BUFFER_SIZE_ELEMENTS 512
+
+#define rmalloc(n)    malloc(n)
+#define rrealloc(p,n) realloc(p,n)
+#define rfree(p)      free(p)
+
 // Renderer base classes definition
 class RVector2i {
     public:
@@ -157,7 +163,7 @@ struct rperfstats_t {
 };
 
 // Enum for buffer header flags
-enum rbufferheader_flags {
+enum rbufferheader_flags_t {
     FLAG_NONE     = 0,
     FLAG_TEMPORAL = _BV(0)
 };
@@ -180,6 +186,23 @@ struct rbufferheader_t {
     intptr_t txc_offset;
     // flags? / textures? / parameters?
     uint32_t flags;
+};
+
+// Info for OpenGL ES 2.0 renderer
+struct rgles2info_t {
+    GLint MAX_FRAGMENT_UNIFORM_VECTORS;
+    GLint MAX_VERTEX_UNIFORM_VECTORS;
+    GLint MAX_VARYING_VECTORS;
+    GLint MAX_VERTEX_ATTRIBS;
+    GLint MAX_RENDERBUFFER_SIZE;
+    GLint MAX_TEXTURE_IMAGE_UNITS;
+    GLint MAX_COMBINED_TEXTURE_IMAGE_UNITS;
+    GLint MAX_CUBE_MAP_TEXTURE_SIZE;
+    GLint MAX_TEXTURE_SIZE;
+    // Notify on 0. Vertex texture fetch NOT supported when 0.
+    GLint MAX_VERTEX_TEXTURE_IMAGE_UNITS;
+    GLint MAX_VIEWPORT_DIMS_WIDTH;
+    GLint MAX_VIEWPORT_DIMS_HEIGHT;
 };
 
 #define RBUFFERHEADER_SIZE sizeof(rbufferheader_t)
@@ -294,8 +317,15 @@ class RGLES2 {
 
         // Rendering buffer, DO NOT CONFUSE WITH AN OpenGL RenderBuffer
         void* drawBuffer;
+        // Number of MAX elements in the draw buffer. Used via 
+        uint32_t drawBufferSizeElements;
 
         RPipeline* currentRPipeline;
+
+        // Pipelines
+        RDotPipeline*      dotPipeline;
+        RLinePipeline*     linePipeline;
+        RTrianglePipeline* trianglePipeline;
 
         // Internal methods
         // Switch pipeline: Only if new pipeline is different to the new pipeline
@@ -303,11 +333,26 @@ class RGLES2 {
 
         // Zero performance stats counter. Call every frame!
         void zeroPerfstats();
+
+        // Generate draw buffers / resize draw buffer
+        void* genDrawBuffers(void* drawBuffer, uint32_t drawBufferElements);
     public:
         RGLES2();
         ~RGLES2();
-        // Set Window and start renderer
+
+        /**
+         * @brief Set the Window object. Must be done before calling start
+         * 
+         * @param window 
+         */
         void setWindow(Window* window);
+
+        /**
+         * @brief Sets (or resizes) number of draw buffer elements
+         * 
+         * @param buffer_elements 
+         */
+        int setMaxBufferElements(uint32_t buffer_elements);
 
         /**
          * @brief Starts the RGLES2 renderer.
@@ -323,7 +368,13 @@ class RGLES2 {
          */
         int destroy();
 
+        /**
+         * @brief Submits and clears current buffers to OpenGL API. This function can be called automatically
+         * 
+         */
+        void submit();
         // ...
+
 
 
 

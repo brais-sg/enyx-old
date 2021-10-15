@@ -935,3 +935,73 @@ void RTrianglePipeline::draw(void* buffer){
 }
 
 // TODO. Set texture uniforms on texture pipeline enable!
+// Here starts RGLES2 implementation!
+
+RGLES2::RGLES2(){
+    Debug::info("[%s:%d]: RGLES2 renderer constructor called!\n", __FILE__, __LINE__);
+
+    this->baseWindow  = NULL;
+    this->gContext    = NULL;
+    
+    this->drawBuffer             = NULL;
+    this->drawBufferSizeElements = DEFAULT_DRAW_BUFFER_SIZE_ELEMENTS;
+
+    this->currentRPipeline = NULL;
+
+    // Pipelines
+    this->dotPipeline      = NULL;
+    this->linePipeline     = NULL;
+    this->trianglePipeline = NULL;
+}
+
+RGLES2::~RGLES2(){
+    if(this->gContext){
+        Debug::info("[%s:%d]: Calling RGLES2 destroy() method. Destructor called and renderer is initialized!\n", __FILE__, __LINE__);
+        this->destroy();
+    } else {
+        Debug::info("[%s:%d]: RGLES2 destructor called, renderer already uninitialized!\n", __FILE__, __LINE__);
+    }
+}
+
+void RGLES2::setWindow(Window* window){
+    if(this->baseWindow){
+        Debug::warning("[%s:%d]: setWindow() called, but baseWindow is already set (overwriting)! (base = %p, new = %p)\n", __FILE__, __LINE__, this->baseWindow, window);
+    }
+
+    Debug::info("[%s:%d]: Setting baseWindow to %p\n", __FILE__, __LINE__, window);
+    this->baseWindow = window;
+}
+
+int RGLES2::setMaxBufferElements(uint32_t buffer_elements){
+    Debug::info("[%s:%d]: Setting max buffer elements from %d to %d\n", __FILE__, __LINE__, (int) this->drawBufferSizeElements, (int) buffer_elements);
+    
+    
+    if(this->drawBuffer){
+        this->drawBuffer = (void*) this->genDrawBuffers(this->drawBuffer, buffer_elements);
+        if(this->drawBuffer){
+            Debug::info("[%s:%d]: Buffer resize done!", __FILE__, __LINE__);
+            this->drawBufferSizeElements = buffer_elements;
+        } else {
+            Debug::error("[%s:%d]: Cannot resize the draw buffer!\n", __FILE__, __LINE__);
+            this->drawBuffer = (void*) this->genDrawBuffers(this->drawBuffer, this->drawBufferSizeElements);
+            if(this->drawBuffer == NULL){
+                Debug::critical("[%s:%d]: CRITICAL: Not enought memory for drawBuffer! Aborting!\n", __FILE__, __LINE__);
+                return -1;
+            }
+        }
+    } else {
+        Debug::info("[%s:%d]: Setting drawBuffer max elements before renderer starts\n", __FILE__, __LINE__);
+        this->drawBufferSizeElements = buffer_elements;
+    }
+
+    return 0;
+}
+
+int RGLES2::init(){
+    Debug::info("[%s:%d]: Staring RGLES2 rendering backend for Enyx!\n",__FILE__,__LINE__);
+
+
+
+
+    return 0;
+}
