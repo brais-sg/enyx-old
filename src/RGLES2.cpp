@@ -1145,9 +1145,9 @@ int RGLES2::init(){
 
 
 int RGLES2::destroy(){
-    delete this->dotPipeline;
-    delete this->linePipeline;
-    delete this->trianglePipeline;
+    delete static_cast<RDotPipeline*>(this->dotPipeline);
+    delete static_cast<RLinePipeline*>(this->linePipeline);
+    delete static_cast<RTrianglePipeline*>(this->trianglePipeline);
 
     if(this->drawBuffer){
         rfree(this->drawBuffer);
