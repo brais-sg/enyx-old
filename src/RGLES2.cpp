@@ -998,6 +998,15 @@ int RGLES2::setMaxBufferElements(uint32_t buffer_elements){
     return 0;
 }
 
+// gendrawbuffers!
+void* RGLES2::genDrawBuffers(void* drawBuffer, uint32_t drawBufferElements){
+    Debug::info("[%s:%d]: Generating drawBuffer for %d elements...\n", __FILE__, __LINE__, (int) drawBufferElements);
+
+
+
+
+}
+
 int RGLES2::init(){
     Debug::info("[%s:%d]: Starting RGLES2 rendering backend for Enyx!\n",__FILE__,__LINE__);
 
@@ -1096,6 +1105,8 @@ int RGLES2::init(){
     // this->texturePipelin   = new RTexturePipeline();
     Debug::warning("[%s:%d]: Texture pipeline NOT created! TODO!\n", __FILE__, __LINE__);
 
+
+    // Init buffers now!
 
 
 
