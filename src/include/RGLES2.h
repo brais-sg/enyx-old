@@ -258,7 +258,7 @@ class RPipeline {
 
 class RDotPipeline : public RPipeline {
     private:
-        RShader internalShader;
+        RShader* internalShader;
     public:
         RDotPipeline();
         ~RDotPipeline();
@@ -271,7 +271,7 @@ class RDotPipeline : public RPipeline {
 
 class RLinePipeline : public RPipeline {
     private:
-        RShader internalShader;
+        RShader* internalShader;
     public:
         RLinePipeline();
         ~RLinePipeline();
@@ -284,7 +284,7 @@ class RLinePipeline : public RPipeline {
 
 class RTrianglePipeline : public RPipeline {
     private:
-        RShader internalShader;
+        RShader* internalShader;
     public:
         RTrianglePipeline();
         ~RTrianglePipeline();
@@ -297,7 +297,7 @@ class RTrianglePipeline : public RPipeline {
 
 class RTexturePipeline : public RPipeline {
     private:
-        RShader internalShader;
+        RShader* internalShader;
     public:
         RTexturePipeline();
         ~RTexturePipeline();

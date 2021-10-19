@@ -18,6 +18,7 @@
 #include "Enyx.h"
 
 Window window;
+/**
 Renderer_SDL2_GLES2 agl;
 
 int main(){
@@ -49,6 +50,22 @@ int main(){
 
 
         agl.render();
+    }
+
+
+    window.close();
+    return 0;
+}
+**/
+RGLES2 agl;
+
+int main(){
+    Events::initEventSystem();
+    window.init("RGLES2 Hello world!");
+    agl.setWindow(&window);
+    if(agl.init() != 0){
+        fprintf(stderr, "RGLES2 error!\n");
+        return -1;
     }
 
 

@@ -796,11 +796,15 @@ static void zeroBufferElements(void* buffer){
 // Dot pipeline
 RDotPipeline::RDotPipeline(){
     // Compile internal shader
-    this->internalShader = RShader(basic_vert, basic_frag);
+    this->internalShader = new RShader(basic_vert, basic_frag);
+}
+
+RDotPipeline::~RDotPipeline(){
+    delete this->internalShader;
 }
 
 void RDotPipeline::enable(){
-    this->internalShader.attach();
+    this->internalShader->attach();
     // Disable some OpenGL states. We do NOT need blending in point rendering pipeline
     glDisable(GL_BLEND); 
     // Track number of context changes
@@ -808,11 +812,11 @@ void RDotPipeline::enable(){
 }
 
 void RDotPipeline::disable(){
-    this->internalShader.dettach();
+    this->internalShader->dettach();
 }
 
 void RDotPipeline::setTransform(RMatrix4& matrix){
-    glUniformMatrix4fv(this->internalShader.getTransformMatrixUniform(), 1, GL_FALSE, matrix.getArray());
+    glUniformMatrix4fv(this->internalShader->getTransformMatrixUniform(), 1, GL_FALSE, matrix.getArray());
 }
 
 void RDotPipeline::draw(void* buffer){
@@ -827,8 +831,8 @@ void RDotPipeline::draw(void* buffer){
     uint32_t element_count = header->elements;
 
     // Set OpenGL ES attrib pointers
-    glVertexAttribPointer(this->internalShader.getVertexAttrib(), 3, GL_FLOAT, GL_FALSE, 0, vtxaddr);
-    glVertexAttribPointer(this->internalShader.getColorAttrib(),  4, GL_FLOAT, GL_FALSE, 0, clraddr);
+    glVertexAttribPointer(this->internalShader->getVertexAttrib(), 3, GL_FLOAT, GL_FALSE, 0, vtxaddr);
+    glVertexAttribPointer(this->internalShader->getColorAttrib(),  4, GL_FLOAT, GL_FALSE, 0, clraddr);
 
     // Draw arrays!
     glDrawArrays(GL_POINTS, 0, element_count);
@@ -844,23 +848,27 @@ void RDotPipeline::draw(void* buffer){
 
 // Line pipeline
 RLinePipeline::RLinePipeline(){
-    this->internalShader = RShader(basic_vert, basic_frag);
+    this->internalShader = new RShader(basic_vert, basic_frag);
+}
+
+RLinePipeline::~RLinePipeline(){
+    delete this->internalShader;
 }
 
 void RLinePipeline::enable(){
-    this->internalShader.attach();
+    this->internalShader->attach();
     // Disable some OpenGL states. We do NOT need blending in line rendering pipeline
-    glDisable(GL_BLEND); 
+    glDisable(GL_BLEND);
     // Track number of context changes
     perfstats.context_changes++;
 }
 
 void RLinePipeline::disable(){
-    this->internalShader.dettach();
+    this->internalShader->dettach();
 }
 
 void RLinePipeline::setTransform(RMatrix4& matrix){
-    glUniformMatrix4fv(this->internalShader.getTransformMatrixUniform(), 1, GL_FALSE, matrix.getArray());
+    glUniformMatrix4fv(this->internalShader->getTransformMatrixUniform(), 1, GL_FALSE, matrix.getArray());
 }
 
 void RLinePipeline::draw(void* buffer){
@@ -873,8 +881,8 @@ void RLinePipeline::draw(void* buffer){
     uint32_t element_count = header->elements;
 
     // Set OpenGL ES attrib pointers
-    glVertexAttribPointer(this->internalShader.getVertexAttrib(), 3, GL_FLOAT, GL_FALSE, 0, vtxaddr);
-    glVertexAttribPointer(this->internalShader.getColorAttrib(),  4, GL_FLOAT, GL_FALSE, 0, clraddr);
+    glVertexAttribPointer(this->internalShader->getVertexAttrib(), 3, GL_FLOAT, GL_FALSE, 0, vtxaddr);
+    glVertexAttribPointer(this->internalShader->getColorAttrib(),  4, GL_FLOAT, GL_FALSE, 0, clraddr);
 
     // Draw arrays!
     glDrawArrays(GL_LINES, 0, element_count);
@@ -890,11 +898,15 @@ void RLinePipeline::draw(void* buffer){
 
 // Triangle (Fill) pipeline
 RTrianglePipeline::RTrianglePipeline(){
-    this->internalShader = RShader(basic_vert, basic_frag);
+    this->internalShader = new RShader(basic_vert, basic_frag);
+}
+
+RTrianglePipeline::~RTrianglePipeline(){
+    delete this->internalShader;
 }
 
 void RTrianglePipeline::enable(){
-    this->internalShader.attach();
+    this->internalShader->attach();
 
     // Enable blending in triangle pipeline
     glEnable(GL_BLEND);
@@ -903,11 +915,11 @@ void RTrianglePipeline::enable(){
 }
 
 void RTrianglePipeline::disable(){
-    this->internalShader.dettach();
+    this->internalShader->dettach();
 }
 
 void RTrianglePipeline::setTransform(RMatrix4& matrix){
-    glUniformMatrix4fv(this->internalShader.getTransformMatrixUniform(), 1, GL_FALSE, matrix.getArray());
+    glUniformMatrix4fv(this->internalShader->getTransformMatrixUniform(), 1, GL_FALSE, matrix.getArray());
 }
 
 void RTrianglePipeline::draw(void* buffer){
@@ -920,8 +932,8 @@ void RTrianglePipeline::draw(void* buffer){
     uint32_t element_count = header->elements;
 
     // Set OpenGL ES attrib pointers
-    glVertexAttribPointer(this->internalShader.getVertexAttrib(), 3, GL_FLOAT, GL_FALSE, 0, vtxaddr);
-    glVertexAttribPointer(this->internalShader.getColorAttrib(),  4, GL_FLOAT, GL_FALSE, 0, clraddr);
+    glVertexAttribPointer(this->internalShader->getVertexAttrib(), 3, GL_FLOAT, GL_FALSE, 0, vtxaddr);
+    glVertexAttribPointer(this->internalShader->getColorAttrib(),  4, GL_FLOAT, GL_FALSE, 0, clraddr);
 
     // Draw arrays!
     glDrawArrays(GL_TRIANGLES, 0, element_count);
@@ -1065,7 +1077,7 @@ int RGLES2::init(){
     Debug::info("[%s:%d]: VENDOR          : %s\n",__FILE__, __LINE__,glGetString(GL_VENDOR));
     Debug::info("[%s:%d]: RENDERER        : %s\n",__FILE__, __LINE__,glGetString(GL_RENDERER));
     Debug::info("[%s:%d]: VERSION         : %s\n",__FILE__, __LINE__,glGetString(GL_VERSION));
-    Debug::info("[%s:%d]: SHADING VERSION : %s\n",__FILE__, __LINE__,glGetString(GL_SHADING_LANGUAGE_VERSION));
+    Debug::info("[%s:%d]: SHADING VERSION : %s\n\n",__FILE__, __LINE__,glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     // Fill renderer info struct
     glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS,     &this->gles2_info.MAX_FRAGMENT_UNIFORM_VECTORS);
@@ -1125,7 +1137,7 @@ int RGLES2::init(){
         return -3;
     }
 
-    
+
 
 
     return 0;
@@ -1133,6 +1145,12 @@ int RGLES2::init(){
 
 
 int RGLES2::destroy(){
+    delete this->dotPipeline;
+    delete this->linePipeline;
+    delete this->trianglePipeline;
 
+    if(this->drawBuffer){
+        rfree(this->drawBuffer);
+    }
     return 0;
 }
