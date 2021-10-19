@@ -1000,11 +1000,24 @@ int RGLES2::setMaxBufferElements(uint32_t buffer_elements){
 
 // gendrawbuffers!
 void* RGLES2::genDrawBuffers(void* drawBuffer, uint32_t drawBufferElements){
-    Debug::info("[%s:%d]: Generating drawBuffer for %d elements...\n", __FILE__, __LINE__, (int) drawBufferElements);
+    if(drawBuffer){
+        Debug::info("[%s:%d]: Resizing drawBuffer %p for %d elements...\n", __FILE__, __LINE__, drawBuffer, (int) drawBufferElements);
+    } else {
+        Debug::info("[%s:%d]: Generating drawBuffer for %d elements...\n", __FILE__, __LINE__, (int) drawBufferElements);
+    }
 
+    size_t total_bytes = RBUFFERHEADER_SIZE + (drawBufferElements * 3) + (drawBufferElements * 4) + (drawBufferElements * 2);
+    Debug::info("[%s:%d]: Total bytes to allocate: %d bytes\n", __FILE__, __LINE__, (int) total_bytes);
+    
 
-
-
+    void* t_drawBuffer = drawBuffer;
+    if(t_drawBuffer){
+        t_drawBuffer = (void*) rrealloc(drawBuffer, total_bytes);
+    } else {
+        t_drawBuffer = (void*) rmalloc(total_bytes);
+    }
+    
+    return t_drawBuffer;
 }
 
 int RGLES2::init(){
@@ -1105,11 +1118,21 @@ int RGLES2::init(){
     // this->texturePipelin   = new RTexturePipeline();
     Debug::warning("[%s:%d]: Texture pipeline NOT created! TODO!\n", __FILE__, __LINE__);
 
-
     // Init buffers now!
+    this->drawBuffer = this->genDrawBuffers(this->drawBuffer, this->drawBufferSizeElements);
+    if(this->drawBuffer == NULL){
+        Debug::error("[%s:%d]: Renderer cannot start! drawBuffer unavaiable!\n", __FILE__, __LINE__);
+        return -3;
+    }
+
+    
 
 
+    return 0;
+}
 
+
+int RGLES2::destroy(){
 
     return 0;
 }

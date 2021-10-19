@@ -188,6 +188,8 @@ struct rbufferheader_t {
     uint32_t flags;
 };
 
+#define RBUFFERHEADER_SIZE sizeof(rbufferheader_t)
+
 // Info for OpenGL ES 2.0 renderer
 struct rgles2info_t {
     GLint MAX_FRAGMENT_UNIFORM_VECTORS;
@@ -205,7 +207,7 @@ struct rgles2info_t {
     GLint MAX_VIEWPORT_DIMS_HEIGHT;
 };
 
-#define RBUFFERHEADER_SIZE sizeof(rbufferheader_t)
+
 
 // Shader class
 class RShader {
@@ -250,7 +252,7 @@ class RPipeline {
         // Draw method (Receives pointer to auxiliary buffer)
         virtual void draw(void* buffer) = 0;
         // Set uniforms!
-        virtual void setTransform(RMatrix4& matrix);
+        virtual void setTransform(RMatrix4& matrix) = 0;
 };
 
 
