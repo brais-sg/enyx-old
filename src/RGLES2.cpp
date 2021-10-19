@@ -846,6 +846,10 @@ void RDotPipeline::draw(void* buffer){
     zeroBufferElements(buffer);
 }
 
+RPipeline::~RPipeline(){
+    
+}
+
 // Line pipeline
 RLinePipeline::RLinePipeline(){
     this->internalShader = new RShader(basic_vert, basic_frag);

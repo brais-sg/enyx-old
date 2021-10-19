@@ -245,6 +245,7 @@ class RShader {
 
 class RPipeline {
     public:
+        virtual ~RPipeline();
         // Enable rendering pipeline (Only on context change)
         virtual void enable()  = 0;
         // Disable rendering pipeline (Only on context change)
