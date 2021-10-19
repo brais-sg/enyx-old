@@ -783,6 +783,7 @@ static rperfstats_t perfstats;
 
 static void zeroBufferElements(void* buffer){
     rbufferheader_t* header = (rbufferheader_t*) buffer;
+    // TODO! Free temporal buffers in this function!
 
     header->elements = 0;
 
@@ -1068,6 +1069,33 @@ int RGLES2::init(){
 
     // Show info about the struct
     // TODO
+    Debug::info("[%s:%d]: GPU: GL_MAX_FRAGMENT_UNIFORM_VECTORS:     %d\n", __FILE__, __LINE__, this->gles2_info.MAX_FRAGMENT_UNIFORM_VECTORS);
+    Debug::info("[%s:%d]: GPU: GL_MAX_VERTEX_UNIFORM_VECTORS:       %d\n", __FILE__, __LINE__, this->gles2_info.MAX_VERTEX_UNIFORM_VECTORS);
+    Debug::info("[%s:%d]: GPU: GL_MAX_VARYING_VECTORS:              %d\n", __FILE__, __LINE__, this->gles2_info.MAX_VARYING_VECTORS);
+    Debug::info("[%s:%d]: GPU: GL_MAX_VERTEX_ATTRIBS:               %d\n", __FILE__, __LINE__, this->gles2_info.MAX_VERTEX_ATTRIBS);
+    Debug::info("[%s:%d]: GPU: GL_MAX_RENDERBUFFER_SIZE:            %d\n", __FILE__, __LINE__, this->gles2_info.MAX_RENDERBUFFER_SIZE);
+    Debug::info("[%s:%d]: GPU: GL_MAX_TEXTURE_IMAGE_UNITS:          %d\n", __FILE__, __LINE__, this->gles2_info.MAX_TEXTURE_IMAGE_UNITS);
+    Debug::info("[%s:%d]: GPU: GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS: %d\n", __FILE__, __LINE__, this->gles2_info.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+    Debug::info("[%s:%d]: GPU: GL_MAX_CUBE_MAP_TEXTURE_SIZE:        %d\n", __FILE__, __LINE__, this->gles2_info.MAX_CUBE_MAP_TEXTURE_SIZE);
+    Debug::info("[%s:%d]: GPU: GL_MAX_TEXTURE_SIZE:                 %d\n", __FILE__, __LINE__, this->gles2_info.MAX_TEXTURE_SIZE);
+    Debug::info("[%s:%d]: GPU: GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS:   %d\n", __FILE__, __LINE__, this->gles2_info.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+    Debug::info("[%s:%d]: GPU: GL_MAX_VIEWPORT_DIMS:                %dx%d\n", __FILE__, __LINE__, this->gles2_info.MAX_VIEWPORT_DIMS_WIDTH, this->gles2_info.MAX_VIEWPORT_DIMS_HEIGHT);
+
+
+    // DONE.
+
+    // Initialize OpenGL ES 2.0 pipelines (And shaders)
+    Debug::info("[%s:%d]: Creating rendering pipelines NOW!\n", __FILE__, __LINE__);
+
+    this->dotPipeline      = new RDotPipeline();
+    Debug::info("[%s:%d]: Dot pipeline done!\n", __FILE__, __LINE__);
+    this->linePipeline     = new RLinePipeline();
+    Debug::info("[%s:%d]: Line pipeline done!\n", __FILE__, __LINE__);
+    this->trianglePipeline = new RTrianglePipeline();
+    Debug::info("[%s:%d]: Triangle pipeline done!\n", __FILE__, __LINE__);
+    // this->texturePipelin   = new RTexturePipeline();
+    Debug::warning("[%s:%d]: Texture pipeline NOT created! TODO!\n", __FILE__, __LINE__);
+
 
 
 

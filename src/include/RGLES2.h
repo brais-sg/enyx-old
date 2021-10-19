@@ -326,7 +326,7 @@ class RGLES2 {
         RDotPipeline*      dotPipeline;
         RLinePipeline*     linePipeline;
         RTrianglePipeline* trianglePipeline;
-
+        // RTexturePipeline*  texturePipeline;
 
         // Renderer info struct 
         rgles2info_t gles2_info;
