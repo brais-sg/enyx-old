@@ -208,7 +208,6 @@ struct rgles2info_t {
 };
 
 
-
 // Shader class
 class RShader {
     private:

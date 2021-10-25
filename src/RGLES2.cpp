@@ -1149,12 +1149,20 @@ int RGLES2::init(){
 
 
 int RGLES2::destroy(){
+    Debug::info("[%s:%d]: RGLES2 destroy() method called!\n", __FILE__, __LINE__);
+    
     delete static_cast<RDotPipeline*>(this->dotPipeline);
     delete static_cast<RLinePipeline*>(this->linePipeline);
     delete static_cast<RTrianglePipeline*>(this->trianglePipeline);
 
     if(this->drawBuffer){
+        Debug::info("[%s:%d]: Freeing the drawBuffer...\n", __FILE__, __LINE__);
         rfree(this->drawBuffer);
     }
+
+    // Delete renderer's textures / OpenGL context
+
+    SDL_GL_DeleteContext(this->gContext);
+
     return 0;
 }
