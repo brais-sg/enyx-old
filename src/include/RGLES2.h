@@ -356,7 +356,10 @@ class RGLES2 {
         void* genDrawBuffers(void* drawBuffer, uint32_t drawBufferElements);
 
         // Request elements for drawing
-        int requestElements(size_t elements, rbufferptr_t* rbufferptr);
+        void* allocateElements(size_t elements, rbufferptr_t* rbufferptr);
+
+        // Update drawing buffers before allocation
+       void updateBuffer(void* buffer, size_t vtx, size_t nrm, size_t clr, size_t txc);
     public:
         RGLES2();
         ~RGLES2();
@@ -394,6 +397,13 @@ class RGLES2 {
          * 
          */
         void submit();
+
+        /**
+         * @brief Submits and clears current buffers to OpenGL API. This function can be called automatically
+         * 
+         * @param buffer drawBuffer to use
+         */
+        void submit(void* buffer);
 
         /**
          * @brief Clear the rendering buffers

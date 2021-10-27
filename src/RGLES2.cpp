@@ -1199,6 +1199,14 @@ void RGLES2::submit(){
     }
 }
 
+void RGLES2::submit(void* buffer){
+    if(this->currentRPipeline){
+        this->currentRPipeline->draw(buffer);
+    } else {
+        Debug::warning("[%s:%d]: submit() method called but no rendering pipeline is active!\n", __FILE__, __LINE__);
+    }
+}
+
 void RGLES2::setPipeline(RPipeline* pipeline){
     if(this->currentRPipeline != pipeline){
         // Pipeline change! Submit, dettach old pipeline and attach new pipeline
@@ -1215,8 +1223,8 @@ void RGLES2::clearBuffers(){
     zeroBufferElements(this->drawBuffer);
 }
 
-int RGLES2::requestElements(size_t elements, rbufferptr_t* rbufferptr){
-    // Request "elements" elemens for drawing! (Allocates drawBuffer memory)
+void* RGLES2::allocateElements(size_t elements, rbufferptr_t* rbufferptr){
+    // Allocate "elements" elemens for drawing! (Allocates drawBuffer memory)
     rbufferheader_t* header = (rbufferheader_t*) this->drawBuffer;
 
     if(elements > header->buffer_max_elements){
@@ -1247,11 +1255,14 @@ int RGLES2::requestElements(size_t elements, rbufferptr_t* rbufferptr){
             rbufferptr->nrm_ptr = (void*) NULL;
             rbufferptr->clr_ptr = (void*) ((intptr_t) tmp_buffer + RBUFFERHEADER_SIZE + header->clr_offset);
             rbufferptr->txc_ptr = (void*) ((intptr_t) tmp_buffer + RBUFFERHEADER_SIZE + header->txc_offset);
+
+            // Set number of elements
+            tmp_header->elements = elements;
             
-            return elements;
+            return tmp_buffer;
         } else {
             Debug::error("[%s:%d]: Cannot allocate %d elements for drawing operation in auxiliary buffer!\n", __FILE__, __LINE__, (int) elements);
-            return 0;
+            return NULL;
         }
     } else {
         if(elements > (header->buffer_max_elements - header->elements)){
@@ -1260,17 +1271,33 @@ int RGLES2::requestElements(size_t elements, rbufferptr_t* rbufferptr){
         }
 
         // Allocate space for "elements" elements in the global draw buffer
-        intptr_t vtx_ptr_offset = (header->vtx_count * 3 * sizeof(float));
-        intptr_t clr_ptr_offset = (header->clr_count * 4 * sizeof(float));
-        intptr_t txc_ptr_offset = (header->txc_count * 2 * sizeof(float));
+        intptr_t vtx_ptr_offset = (intptr_t) header->vtx_offset + (header->vtx_count * 3 * sizeof(float));
+        intptr_t clr_ptr_offset = (intptr_t) header->clr_offset + (header->clr_count * 4 * sizeof(float));
+        intptr_t txc_ptr_offset = (intptr_t) header->txc_offset + (header->txc_count * 2 * sizeof(float));
 
+        // Set new element count
+        header->elements += elements;
 
         // TODO! Set bufferptr!
+        rbufferptr->vtx_ptr = (void*) vtx_ptr_offset;
         rbufferptr->nrm_ptr = (void*) NULL;
+        rbufferptr->clr_ptr = (void*) clr_ptr_offset;
+        rbufferptr->txc_ptr = (void*) txc_ptr_offset;
 
-
-
-
-        return elements;
+        return this->drawBuffer;
     }
+}
+
+
+void RGLES2::updateBuffer(void* buffer, size_t vtx, size_t nrm, size_t clr, size_t txc){
+    rbufferheader_t* header = (rbufferheader_t*) buffer;
+    if(header->flags & FLAG_TEMPORAL){
+        // Render and deallocate the draw buffer
+        this->submit(buffer);
+        return;
+    }
+
+    header->vtx_count += vtx;
+    header->clr_count += clr;
+    header->txc_count += txc;
 }
