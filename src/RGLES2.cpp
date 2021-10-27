@@ -1192,6 +1192,10 @@ int RGLES2::destroy(){
 }
 
 void RGLES2::submit(){
+    // Check if pending elements
+    rbufferheader_t* header = (rbufferheader_t*) this->drawBuffer;
+    if(header->elements == 0) return;
+
     if(this->currentRPipeline){
         this->currentRPipeline->draw(this->drawBuffer);
     } else {
@@ -1200,6 +1204,10 @@ void RGLES2::submit(){
 }
 
 void RGLES2::submit(void* buffer){
+    // Check if pending elements
+    rbufferheader_t* header = (rbufferheader_t*) buffer;
+    if(header->elements == 0) return;
+
     if(this->currentRPipeline){
         this->currentRPipeline->draw(buffer);
     } else {
@@ -1301,3 +1309,32 @@ void RGLES2::updateBuffer(void* buffer, size_t vtx, size_t nrm, size_t clr, size
     header->clr_count += clr;
     header->txc_count += txc;
 }
+
+
+
+// Viewport settings
+void RGLES2::viewport(int x, int y, int w, int h){
+    this->submit();
+
+    glViewport(x, y, w, h);
+}
+
+void RGLES2::viewport(){
+    this->submit();
+
+    glViewport(0, 0, this->baseWindow->getWidth(), this->baseWindow->getHeight());
+}
+
+void RGLES2::scissor(int x, int y, int w, int h){
+    this->submit();
+
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(x, y, w, h);
+}
+
+void RGLES2::scissor(){
+    this->submit();
+
+    glDisable(GL_SCISSOR_TEST);
+}
+

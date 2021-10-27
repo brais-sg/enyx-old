@@ -412,9 +412,39 @@ class RGLES2 {
         void clearBuffers();
 
 
+        // Viewport, scissor and coordinate transformations!
 
+        /**
+         * @brief Sets the renderer viewport
+         * 
+         * @param x Viewport X position
+         * @param y Viewport Y position
+         * @param w Viewport width
+         * @param h Viewport height
+         */
+        void viewport(int x, int y, int w, int h);
 
+        /**
+         * @brief Resets the renderer viewport (window size)
+         * 
+         */
+        void viewport();
 
+        /**
+         * @brief Enables and sets scissor testing
+         * 
+         * @param x Scissor rectangle X coordinate
+         * @param y Scissor rectangle Y coordinate
+         * @param w Scissor rectangle width
+         * @param h Scissor rectangle height
+         */
+        void scissor(int x, int y, int w, int h);
+
+        /**
+         * @brief Disables scissor testing
+         * 
+         */
+        void scissor();
 };
 
 #endif
