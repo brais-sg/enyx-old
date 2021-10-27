@@ -784,6 +784,12 @@ static rperfstats_t perfstats;
 static void zeroBufferElements(void* buffer){
     rbufferheader_t* header = (rbufferheader_t*) buffer;
     // TODO! Free temporal buffers in this function!
+    // DONE!
+    if(header->flags & FLAG_TEMPORAL){
+        perfstats.auxiliary_buffers_used++;
+        free(buffer);
+        return;
+    }
 
     header->elements = 0;
 
@@ -920,6 +926,7 @@ void RTrianglePipeline::enable(){
 
 void RTrianglePipeline::disable(){
     this->internalShader->dettach();
+    glDisable(GL_BLEND);
 }
 
 void RTrianglePipeline::setTransform(RMatrix4& matrix){
@@ -1143,7 +1150,7 @@ int RGLES2::init(){
 
 
 
-
+    Debug::info("[%s:%d]: RGLES2 renderer init completed!\n", __FILE__, __LINE__);
     return 0;
 }
 
@@ -1165,4 +1172,23 @@ int RGLES2::destroy(){
     SDL_GL_DeleteContext(this->gContext);
 
     return 0;
+}
+
+void RGLES2::submit(){
+    if(this->currentRPipeline){
+        this->currentRPipeline->draw(this->drawBuffer);
+    } else {
+        Debug::warning("[%s:%d]: submit() method called but no rendering pipeline is active!\n", __FILE__, __LINE__);
+    }
+}
+
+void RGLES2::setPipeline(RPipeline* pipeline){
+    if(this->currentRPipeline != pipeline){
+        // Pipeline change! Submit, dettach old pipeline and attach new pipeline
+        this->submit();
+
+        if(this->currentRPipeline) this->currentRPipeline->disable();
+        this->currentRPipeline = pipeline;
+        this->currentRPipeline->enable();
+    }
 }

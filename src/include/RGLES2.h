@@ -337,6 +337,7 @@ class RGLES2 {
         void setPipeline(RPipeline* pipeline);
 
         // Zero performance stats counter. Call every frame!
+        // Or not
         void zeroPerfstats();
 
         // Generate draw buffers / resize draw buffer
