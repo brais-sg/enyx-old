@@ -787,12 +787,12 @@ static void zeroBufferElements(void* buffer){
     // DONE!
     if(header->flags & FLAG_TEMPORAL){
         perfstats.auxiliary_buffers_used++;
-        free(buffer);
+        rfree(buffer);
         return;
     }
 
     header->elements = 0;
-
+    // TODO: Normals!
     header->vtx_count = 0;
     header->clr_count = 0;
     header->txc_count = 0;
@@ -1029,7 +1029,7 @@ void* RGLES2::genDrawBuffers(void* drawBuffer, uint32_t drawBufferElements){
         Debug::info("[%s:%d]: Generating drawBuffer for %d elements...\n", __FILE__, __LINE__, (int) drawBufferElements);
     }
 
-    size_t total_bytes = RBUFFERHEADER_SIZE + (drawBufferElements * 3) + (drawBufferElements * 4) + (drawBufferElements * 2);
+    size_t total_bytes = RBUFFERHEADER_SIZE + (drawBufferElements * 3 * sizeof(float)) + (drawBufferElements * 4 * sizeof(float)) + (drawBufferElements * 2 * sizeof(float));
     Debug::info("[%s:%d]: Total bytes to allocate: %d bytes\n", __FILE__, __LINE__, (int) total_bytes);
     
 
@@ -1039,6 +1039,23 @@ void* RGLES2::genDrawBuffers(void* drawBuffer, uint32_t drawBufferElements){
     } else {
         t_drawBuffer = (void*) rmalloc(total_bytes);
     }
+    // Set header!
+    rbufferheader_t* header = (rbufferheader_t*) t_drawBuffer;
+
+    header->buffer_size         = total_bytes - RBUFFERHEADER_SIZE;
+    header->buffer_max_elements = drawBufferElements;
+    header->elements            = 0;
+
+    header->vtx_count           = 0;
+    header->clr_count           = 0;
+    header->txc_count           = 0;
+
+    header->vtx_offset          = 0;
+    header->clr_offset          = (drawBufferElements * 3 * sizeof(float));
+    header->txc_offset          = (header->clr_offset) + (drawBufferElements * 4 * sizeof(float));
+
+    // NO FLAGS!
+    header->flags               = FLAG_NONE;
     
     return t_drawBuffer;
 }
@@ -1190,5 +1207,70 @@ void RGLES2::setPipeline(RPipeline* pipeline){
         if(this->currentRPipeline) this->currentRPipeline->disable();
         this->currentRPipeline = pipeline;
         this->currentRPipeline->enable();
+    }
+}
+
+
+void RGLES2::clearBuffers(){
+    zeroBufferElements(this->drawBuffer);
+}
+
+int RGLES2::requestElements(size_t elements, rbufferptr_t* rbufferptr){
+    // Request "elements" elemens for drawing! (Allocates drawBuffer memory)
+    rbufferheader_t* header = (rbufferheader_t*) this->drawBuffer;
+
+    if(elements > header->buffer_max_elements){
+        // This will create a temporal buffer
+        size_t total_bytes = RBUFFERHEADER_SIZE + (elements * 3 * sizeof(float)) + (elements * 4 * sizeof(float)) + (elements * 2 * sizeof(float));
+        void* tmp_buffer = (void*) rmalloc(total_bytes);
+
+        if(tmp_buffer){
+            rbufferheader_t* tmp_header = (rbufferheader_t*) tmp_buffer;
+
+            tmp_header->buffer_size         = total_bytes - RBUFFERHEADER_SIZE;
+            tmp_header->buffer_max_elements = elements;
+            tmp_header->elements            = 0;
+
+            tmp_header->vtx_count           = 0;
+            tmp_header->clr_count           = 0;
+            tmp_header->txc_count           = 0;
+
+            tmp_header->vtx_offset          = 0;
+            tmp_header->clr_offset          = (elements * 3 * sizeof(float));
+            tmp_header->txc_offset          = (header->clr_offset) + (elements * 4 * sizeof(float));
+
+            // Temporal buffer flag!
+            tmp_header->flags               = FLAG_TEMPORAL;
+
+            // Buffer created! Return info to rbufferptr struct
+            rbufferptr->vtx_ptr = (void*) ((intptr_t) tmp_buffer + RBUFFERHEADER_SIZE + header->vtx_offset);
+            rbufferptr->nrm_ptr = (void*) NULL;
+            rbufferptr->clr_ptr = (void*) ((intptr_t) tmp_buffer + RBUFFERHEADER_SIZE + header->clr_offset);
+            rbufferptr->txc_ptr = (void*) ((intptr_t) tmp_buffer + RBUFFERHEADER_SIZE + header->txc_offset);
+            
+            return elements;
+        } else {
+            Debug::error("[%s:%d]: Cannot allocate %d elements for drawing operation in auxiliary buffer!\n", __FILE__, __LINE__, (int) elements);
+            return 0;
+        }
+    } else {
+        if(elements > (header->buffer_max_elements - header->elements)){
+            // No free space... Submit current buffers!
+            this->submit();
+        }
+
+        // Allocate space for "elements" elements in the global draw buffer
+        intptr_t vtx_ptr_offset = (header->vtx_count * 3 * sizeof(float));
+        intptr_t clr_ptr_offset = (header->clr_count * 4 * sizeof(float));
+        intptr_t txc_ptr_offset = (header->txc_count * 2 * sizeof(float));
+
+
+        // TODO! Set bufferptr!
+        rbufferptr->nrm_ptr = (void*) NULL;
+
+
+
+
+        return elements;
     }
 }

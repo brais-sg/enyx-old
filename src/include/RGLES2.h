@@ -162,6 +162,18 @@ struct rperfstats_t {
     // ...
 };
 
+// Struct for bufferptr_t
+struct rbufferptr_t {
+    // Vertex pointer
+    void* vtx_ptr;
+    // Normal pointer
+    void* nrm_ptr;
+    // Color pointer
+    void* clr_ptr;
+    // Texcoord pointer
+    void* txc_ptr;
+};
+
 // Enum for buffer header flags
 enum rbufferheader_flags_t {
     FLAG_NONE     = 0,
@@ -342,6 +354,9 @@ class RGLES2 {
 
         // Generate draw buffers / resize draw buffer
         void* genDrawBuffers(void* drawBuffer, uint32_t drawBufferElements);
+
+        // Request elements for drawing
+        int requestElements(size_t elements, rbufferptr_t* rbufferptr);
     public:
         RGLES2();
         ~RGLES2();
@@ -379,8 +394,12 @@ class RGLES2 {
          * 
          */
         void submit();
-        // ...
 
+        /**
+         * @brief Clear the rendering buffers
+         * 
+         */
+        void clearBuffers();
 
 
 
