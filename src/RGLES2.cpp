@@ -1199,6 +1199,7 @@ void RGLES2::submit(){
 
     if(this->currentRPipeline){
         this->currentRPipeline->draw(this->drawBuffer);
+        this->clearBuffers();
     } else {
         Debug::warning("[%s:%d]: submit() method called but no rendering pipeline is active!\n", __FILE__, __LINE__);
     }
@@ -1211,9 +1212,19 @@ void RGLES2::submit(void* buffer){
 
     if(this->currentRPipeline){
         this->currentRPipeline->draw(buffer);
+        zeroBufferElements(buffer);
     } else {
         Debug::warning("[%s:%d]: submit() method called but no rendering pipeline is active!\n", __FILE__, __LINE__);
     }
+}
+
+void RGLES2::render(){
+    // Frame rendered!
+    this->submit();
+    glFlush();
+    glFinish();
+    // Swap chain / Show changes in window
+    this->baseWindow->GL_SwapWindow();
 }
 
 void RGLES2::setPipeline(RPipeline* pipeline){
@@ -1290,11 +1301,11 @@ void* RGLES2::allocateElements(size_t elements, rbufferptr_t* rbufferptr){
         // Set new element count
         header->elements += elements;
 
-        // TODO! Set bufferptr!
-        rbufferptr->vtx_ptr = (void*) vtx_ptr_offset;
-        rbufferptr->nrm_ptr = (void*) NULL;
-        rbufferptr->clr_ptr = (void*) clr_ptr_offset;
-        rbufferptr->txc_ptr = (void*) txc_ptr_offset;
+        // TODO! Set bufferptr! (DONE)
+        rbufferptr->vtx_ptr = (void*) ((intptr_t) this->drawBuffer + vtx_ptr_offset);
+        rbufferptr->nrm_ptr = (void*) ((intptr_t) NULL);
+        rbufferptr->clr_ptr = (void*) ((intptr_t) this->drawBuffer + clr_ptr_offset);
+        rbufferptr->txc_ptr = (void*) ((intptr_t) this->drawBuffer + txc_ptr_offset);
 
         return this->drawBuffer;
     }
@@ -1314,7 +1325,11 @@ void RGLES2::updateBuffer(void* buffer, size_t vtx, size_t nrm, size_t clr, size
     header->txc_count += txc;
 }
 
-
+void RGLES2::updateTransform(){
+    if(this->currentRPipeline){
+        this->currentRPipeline->setTransform(this->tMatrix);
+    }
+}
 
 // Viewport settings
 void RGLES2::viewport(int x, int y, int w, int h){
@@ -1342,3 +1357,86 @@ void RGLES2::scissor(){
     glDisable(GL_SCISSOR_TEST);
 }
 
+void RGLES2::origin(){
+    this->submit();
+    // PLEASE Brais of the future, put this in a method!
+    this->tMatrix = RMatrix4::ortho(0, this->baseWindow->getWidth(), this->baseWindow->getHeight(), 0, -1, 1);
+    this->updateTransform();
+}
+
+void RGLES2::translate(float tx, float ty){
+    this->submit();
+    this->tMatrix *= RMatrix4::translation(tx, ty);
+    this->updateTransform();
+}
+
+void RGLES2::translate(int tx, int ty){
+    this->translate((float) tx, (float) ty);
+}
+
+void RGLES2::rotate(float angle){
+    this->submit();
+    this->tMatrix *= RMatrix4::rotation(angle);
+    this->updateTransform();
+}
+
+void RGLES2::scale(float x, float y){
+    this->submit();
+    this->tMatrix *= RMatrix4::scaling(x, y);
+    this->updateTransform();
+}
+
+void RGLES2::scale(int x, int y){
+    this->scale((float) x, (float) y);
+}
+
+RMatrix4 RGLES2::getTransformationMatrix() const {
+    return this->tMatrix;
+}
+
+void RGLES2::setTransfomationMatrix(const RMatrix4& tmatrix){
+    this->tMatrix = tmatrix;
+}
+
+// RENDERING METHODS!
+
+void RGLES2::clearColor(color_t color){
+    float r = R(color) / 255.f;
+    float g = G(color) / 255.f;
+    float b = B(color) / 255.f;
+    float a = A(color) / 255.f;
+
+    glClearColor(r, g, b, a);
+}
+
+void RGLES2::clear(){
+    glClear(GL_COLOR_BUFFER_BIT);
+    this->clearBuffers();
+}
+
+void color2rcolor(color_t color, color4_t* rcolor){
+    rcolor->r = R(color) / 255.f;
+    rcolor->g = G(color) / 255.f;
+    rcolor->b = B(color) / 255.f;
+    rcolor->a = A(color) / 255.f;
+}
+
+
+void RGLES2::drawPixel(int x, int y, color_t color){
+    rbufferptr_t e_ptr;
+    void* buffer;
+
+    this->setPipeline(this->dotPipeline);
+    buffer = this->allocateElements(1, &e_ptr);
+    
+    vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
+    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+
+    vertices[0].x = (float) x;
+    vertices[0].y = (float) y;
+    vertices[0].z = (float) 0.f;
+
+    color2rcolor(color, colors);
+
+    this->updateBuffer(buffer, 1, 0, 1, 0);
+}

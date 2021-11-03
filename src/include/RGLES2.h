@@ -21,6 +21,10 @@
 #define _BV(x) ((1) << (x))
 #endif
 
+#ifndef DEG2RAD
+#define DEG2RAD(x) ((x) * M_PI / 180.f);
+#endif
+
 #define DEFAULT_DRAW_BUFFER_SIZE_ELEMENTS 512
 
 #define rmalloc(n)    malloc(n)
@@ -362,6 +366,9 @@ class RGLES2 {
 
         // Update drawing buffers before allocation
        void updateBuffer(void* buffer, size_t vtx, size_t nrm, size_t clr, size_t txc);
+
+       // Update transform
+       void updateTransform();
     public:
         RGLES2();
         ~RGLES2();
@@ -408,6 +415,12 @@ class RGLES2 {
         void submit(void* buffer);
 
         /**
+         * @brief Ends a rendering operation and update swap-chain
+         * 
+         */
+        void render();
+
+        /**
          * @brief Clear the rendering buffers
          * 
          */
@@ -447,6 +460,78 @@ class RGLES2 {
          * 
          */
         void scissor();
+
+
+        // Coordinate transformations
+
+        /**
+         * @brief Resets coordinate transformations
+         * 
+         */
+
+        void origin();
+
+        /**
+         * @brief Translates to tx, ty
+         * 
+         * @param tx 
+         * @param ty 
+         */
+        void translate(float tx, float ty);
+
+        /**
+         * @brief Translates to tx, ty
+         * 
+         * @param tx 
+         * @param ty 
+         */
+        void translate(int tx, int ty);
+
+        /**
+         * @brief Rotates angle radians
+         * 
+         * @param angle 
+         */
+        void rotate(float angle);
+
+        /**
+         * @brief Scales by x,y
+         * 
+         * @param x 
+         * @param y 
+         */
+        void scale(float x, float y);
+
+        /**
+         * @brief Scales by x,y
+         * 
+         * @param x 
+         * @param y 
+         */
+        void scale(int x, int y);
+
+        /**
+         * @brief Get the Transformation Matrix object
+         * 
+         * @return RMatrix4 
+         */
+        RMatrix4 getTransformationMatrix() const;
+
+        /**
+         * @brief Set the Transfomation Matrix object
+         * 
+         * @param tmatrix 
+         */
+        void     setTransfomationMatrix(const RMatrix4& tmatrix);
+
+
+        // RENDERING METHODS!
+        void clearColor(color_t color);
+        void clear();
+        // void fillScreen(color_t color);
+
+
+        void drawPixel(int x, int y, color_t color);
 };
 
 #endif

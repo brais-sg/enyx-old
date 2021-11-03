@@ -69,6 +69,18 @@ int main(){
     }
 
 
+    while(Events::isAppRunning()){
+        Events::processEvents();
+        agl.clear();
+        agl.origin();
+
+
+        agl.drawPixel(10, 10, RED);
+
+        agl.render();
+    }
+
+
     window.close();
     return 0;
 }
