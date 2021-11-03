@@ -69,13 +69,23 @@ int main(){
     }
 
 
+    float angle = 0.f;
+
     while(Events::isAppRunning()){
         Events::processEvents();
         agl.clear();
         agl.origin();
 
-        for(int i=0; i < 550; i++)
-        agl.drawPixel(10, i, RED);
+        agl.translate(150, 150);
+        agl.rotate(angle);
+        agl.translate(-50, -50);
+
+        for(int i = 0; i < 150; i++){
+            agl.drawPixel(0, i, RED);
+            agl.drawPixel(i, 0, BLUE);
+        }
+
+        angle+= 0.05f;
 
         agl.render();
     }
