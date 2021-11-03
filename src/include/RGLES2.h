@@ -135,6 +135,10 @@ typedef struct {
 } __attribute__((packed)) vertex3_t;
 
 typedef struct {
+    float x, y, z;
+} __attribute__((packed)) normal3_t;
+
+typedef struct {
     float r, g, b, a;
 } __attribute__((packed)) color4_t;
 
