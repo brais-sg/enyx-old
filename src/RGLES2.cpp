@@ -1294,9 +1294,9 @@ void* RGLES2::allocateElements(size_t elements, rbufferptr_t* rbufferptr){
         }
 
         // Allocate space for "elements" elements in the global draw buffer
-        intptr_t vtx_ptr_offset = (intptr_t) header->vtx_offset + (header->vtx_count * 3 * sizeof(float));
-        intptr_t clr_ptr_offset = (intptr_t) header->clr_offset + (header->clr_count * 4 * sizeof(float));
-        intptr_t txc_ptr_offset = (intptr_t) header->txc_offset + (header->txc_count * 2 * sizeof(float));
+        intptr_t vtx_ptr_offset = (intptr_t) RBUFFERHEADER_SIZE + header->vtx_offset + (header->vtx_count * 3 * sizeof(float));
+        intptr_t clr_ptr_offset = (intptr_t) RBUFFERHEADER_SIZE + header->clr_offset + (header->clr_count * 4 * sizeof(float));
+        intptr_t txc_ptr_offset = (intptr_t) RBUFFERHEADER_SIZE + header->txc_offset + (header->txc_count * 2 * sizeof(float));
 
         // Set new element count
         header->elements += elements;
@@ -1430,7 +1430,7 @@ void RGLES2::drawPixel(int x, int y, color_t color){
     buffer = this->allocateElements(1, &e_ptr);
     
     vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
-    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+    color4_t*  colors   = (color4_t*)  e_ptr.clr_ptr;
 
     vertices[0].x = (float) x;
     vertices[0].y = (float) y;

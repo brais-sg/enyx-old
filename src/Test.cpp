@@ -74,8 +74,8 @@ int main(){
         agl.clear();
         agl.origin();
 
-
-        agl.drawPixel(10, 10, RED);
+        for(int i=0; i < 550; i++)
+        agl.drawPixel(10, i, RED);
 
         agl.render();
     }
