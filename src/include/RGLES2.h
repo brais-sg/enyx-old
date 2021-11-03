@@ -336,6 +336,8 @@ class RGLES2 {
 
         RPipeline* currentRPipeline;
 
+        // Where's the Matrix?
+        RMatrix4 tMatrix;
         // Pipelines
         RDotPipeline*      dotPipeline;
         RLinePipeline*     linePipeline;

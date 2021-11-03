@@ -1165,7 +1165,8 @@ int RGLES2::init(){
         return -3;
     }
 
-
+    // Renderer mvpMatrix
+    this->tMatrix = RMatrix4::ortho(0, this->baseWindow->getWidth(), this->baseWindow->getHeight(), 0, -1, 1);
 
     Debug::info("[%s:%d]: RGLES2 renderer init completed!\n", __FILE__, __LINE__);
     return 0;
@@ -1223,6 +1224,9 @@ void RGLES2::setPipeline(RPipeline* pipeline){
         if(this->currentRPipeline) this->currentRPipeline->disable();
         this->currentRPipeline = pipeline;
         this->currentRPipeline->enable();
+
+        // Set transformation matrix uniform!!
+        this->currentRPipeline->setTransform(this->tMatrix);
     }
 }
 
