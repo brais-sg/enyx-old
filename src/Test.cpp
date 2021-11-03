@@ -90,7 +90,7 @@ int main(){
         agl.render();
     }
 
-
+    agl.destroy();
     window.close();
     return 0;
 }
