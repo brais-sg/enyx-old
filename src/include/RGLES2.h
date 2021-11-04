@@ -687,7 +687,6 @@ class RGLES2 {
          */
         void drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color1, color_t color2, color_t color3);
 
-
 };
 
 #endif

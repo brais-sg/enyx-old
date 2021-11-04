@@ -74,6 +74,25 @@ int main(){
         agl.clear();
         agl.origin();
 
+        // Pixel lines
+        for(int i = 0; i < 800; i++){
+            if(i % 3){
+                agl.drawPixel(i, 4, RED);
+            } else {
+                agl.drawPixel(i, 4, BLUE);
+            }
+
+            agl.drawPixel(i, 12, WHITE);
+        }
+
+        // Lines
+        agl.drawLine(2, 18, 798, 18, MAGENTA);
+        agl.drawLine(2, 24, 798, 24, RED, GREEN);
+
+        // Rectangles
+        agl.drawFillRect(40,40,32,32, GREEN);
+        agl.drawRect(40,40,32,32, WHITE);
+
         agl.drawFillCircle(400,300,100, MAGENTA, CYAN);
         agl.drawFillTriangle(350, 300, 300, 400, 400, 400, RED, GREEN, BLUE);
         agl.drawTriangle(350, 300, 300, 400, 400, 400, WHITE);
