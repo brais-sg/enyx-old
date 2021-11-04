@@ -1195,7 +1195,7 @@ int RGLES2::destroy(){
     if(this->gContext){
         SDL_GL_DeleteContext(this->gContext);
     }
-    
+
     this->gContext = NULL;
     return 0;
 }
@@ -1422,13 +1422,24 @@ void RGLES2::clear(){
     this->clearBuffers();
 }
 
-void color2rcolor(color_t color, color4_t* rcolor){
+inline void color2rcolor(color4_t* rcolor, color_t color){
     rcolor->r = R(color) / 255.f;
     rcolor->g = G(color) / 255.f;
     rcolor->b = B(color) / 255.f;
     rcolor->a = A(color) / 255.f;
 }
 
+inline void copycolor(color4_t* dest, color_t src, size_t count){
+    color4_t src_color;
+    color2rcolor(&src_color, src);
+
+    for(size_t i = 0; i < count; i++){
+        dest[i].r = src_color.r;
+        dest[i].g = src_color.g;
+        dest[i].b = src_color.b;
+        dest[i].a = src_color.a;
+    }
+}
 
 void RGLES2::drawPixel(int x, int y, color_t color){
     rbufferptr_t e_ptr;
@@ -1444,7 +1455,146 @@ void RGLES2::drawPixel(int x, int y, color_t color){
     vertices[0].y = (float) y;
     vertices[0].z = (float) 0.f;
 
-    color2rcolor(color, colors);
+    color2rcolor(&colors[0], color);
 
     this->updateBuffer(buffer, 1, 0, 1, 0);
+}
+
+void RGLES2::drawLine(int x0, int y0, int x1, int y1, color_t color){
+    rbufferptr_t e_ptr;
+    void* buffer;
+
+    this->setPipeline(linePipeline);
+    buffer = this->allocateElements(2, &e_ptr);
+
+    vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
+    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+
+    vertices[0].x = (float) x0;
+    vertices[0].y = (float) y0;
+    vertices[0].z = (float) 0.f;
+    vertices[1].x = (float) x1;
+    vertices[1].y = (float) y1;
+    vertices[1].z = (float) 0.f;
+
+    copycolor(&colors[0], color, 2);
+
+    this->updateBuffer(buffer, 2, 0, 2, 0);
+}
+
+void RGLES2::drawLine(int x0, int y0, int x1, int y1, color_t color1, color_t color2){
+    rbufferptr_t e_ptr;
+    void* buffer;
+
+    this->setPipeline(linePipeline);
+    buffer = this->allocateElements(2, &e_ptr);
+
+    vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
+    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+
+    vertices[0].x = (float) x0;
+    vertices[0].y = (float) y0;
+    vertices[0].z = (float) 0.f;
+    vertices[1].x = (float) x1;
+    vertices[1].y = (float) y1;
+    vertices[1].z = (float) 0.f;
+
+    color2rcolor(&colors[0], color1);
+    color2rcolor(&colors[1], color2);
+
+    this->updateBuffer(buffer, 2, 0, 2, 0);
+}
+
+void RGLES2::drawFastVLine(int x0, int y0, int length, color_t color){
+    this->drawLine(x0, y0, x0, y0 + length, color);
+}
+
+void RGLES2::drawFastHLine(int x0, int y0, int length, color_t color){
+    this->drawLine(x0, y0, x0 + length, y0, color);
+}
+
+void RGLES2::drawRect(int x, int y, int w, int h, color_t color){
+    rbufferptr_t e_ptr;
+    void* buffer;
+
+    this->setPipeline(linePipeline);
+    buffer = this->allocateElements(8, &e_ptr);
+
+    vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
+    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+
+    vertices[0].x = (float) x;
+    vertices[0].y = (float) y;
+    vertices[0].z = 0.f;
+
+    vertices[1].x = (float) x;
+    vertices[1].y = (float) y + h;
+    vertices[1].z = 0.f;
+    
+    vertices[2].x = (float) x;
+    vertices[2].y = (float) y + h;
+    vertices[2].z = 0.f;
+    
+    vertices[3].x = (float) x + w;
+    vertices[3].y = (float) y + h;
+    vertices[3].z = 0.f;
+
+    vertices[4].x = (float) x + w;
+    vertices[4].y = (float) y + h;
+    vertices[4].z = 0.f;
+    
+    vertices[5].x = (float) x + w;
+    vertices[5].y = (float) y;
+    vertices[5].z = 0.f;
+    
+    vertices[6].x = (float) x + w;
+    vertices[6].y = (float) y;
+    vertices[6].z = 0.f;
+
+    vertices[7].x = (float) x;
+    vertices[7].y = (float) y;
+    vertices[7].z = 0.f;
+
+    copycolor(&colors[0], color, 8);
+
+    this->updateBuffer(buffer, 8, 0, 8, 0);
+}
+
+void RGLES2::drawFillRect(int x, int y, int w, int h, color_t color){
+    rbufferptr_t e_ptr;
+    void* buffer;
+
+    this->setPipeline(trianglePipeline);
+    buffer = this->allocateElements(6, &e_ptr);
+
+    vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
+    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+
+    vertices[0].x = (float) x;
+    vertices[0].y = (float) y;
+    vertices[0].z = 0.f;
+
+    vertices[1].x = (float) x;
+    vertices[1].y = (float) y + h;
+    vertices[1].z = 0.f;
+    
+    vertices[2].x = (float) x + w;
+    vertices[2].y = (float) y + h;
+    vertices[2].z = 0.f;
+    
+    vertices[3].x = (float) x + w;
+    vertices[3].y = (float) y + h;
+    vertices[3].z = 0.f;
+
+    vertices[4].x = (float) x + w;
+    vertices[4].y = (float) y;
+    vertices[4].z = 0.f;
+    
+    vertices[5].x = (float) x;
+    vertices[5].y = (float) y;
+    vertices[5].z = 0.f;
+
+    copycolor(&colors[0], color, 6);
+
+    this->updateBuffer(buffer, 6, 0, 6, 0);
 }

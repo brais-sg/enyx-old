@@ -534,8 +534,63 @@ class RGLES2 {
         void clear();
         // void fillScreen(color_t color);
 
-
+        /**
+         * @brief Draws a pixel in coordinate x,y with color color
+         * 
+         * @param x 
+         * @param y 
+         * @param color 
+         */
         void drawPixel(int x, int y, color_t color);
+
+        /**
+         * @brief Draws a line from x0,y0 to x1,y1
+         * 
+         * @param x0 
+         * @param y0 
+         * @param x1 
+         * @param y1 
+         * @param color 
+         */
+        void drawLine(int x0, int y0, int x1, int y1, color_t color);
+
+        /**
+         * @brief Draw a line from x0,y0 to x1,y1 with a color gradient
+         * 
+         * @param x0 
+         * @param y0 
+         * @param x1 
+         * @param y1 
+         * @param color1 
+         * @param color2 
+         */
+        void drawLine(int x0, int y0, int x1, int y1, color_t color1, color_t color2);
+
+
+        void drawFastVLine(int x0, int y0, int length, color_t color);
+        void drawFastHLine(int x0, int y0, int length, color_t color);
+
+        /**
+         * @brief Draws a rectagle
+         * 
+         * @param x 
+         * @param y 
+         * @param w 
+         * @param h 
+         * @param color 
+         */
+        void drawRect(int x, int y, int w, int h, color_t color);
+
+        /**
+         * @brief Draws a fill rectangle
+         * 
+         * @param x 
+         * @param y 
+         * @param w 
+         * @param h 
+         * @param color 
+         */
+        void drawFillRect(int x, int y, int w, int h, color_t color);
 };
 
 #endif
