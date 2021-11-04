@@ -69,13 +69,14 @@ int main(){
     }
 
 
-
     while(Events::isAppRunning()){
         Events::processEvents();
         agl.clear();
         agl.origin();
 
-        agl.drawFillRect(10,10,90,90, RED);
+        agl.drawFillCircle(400,300,100, MAGENTA, CYAN);
+        agl.drawFillTriangle(350, 300, 300, 400, 400, 400, RED, GREEN, BLUE);
+        agl.drawTriangle(350, 300, 300, 400, 400, 400, WHITE);
 
         agl.render();
     }

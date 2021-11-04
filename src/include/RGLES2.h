@@ -26,6 +26,7 @@
 #endif
 
 #define DEFAULT_DRAW_BUFFER_SIZE_ELEMENTS 512
+#define CIRCLE_STEPS 32
 
 #define rmalloc(n)    malloc(n)
 #define rrealloc(p,n) realloc(p,n)
@@ -341,6 +342,7 @@ class RGLES2 {
         void* drawBuffer;
         // Number of MAX elements in the draw buffer. Used via 
         uint32_t drawBufferSizeElements;
+        int circle_steps;
 
         RPipeline* currentRPipeline;
 
@@ -566,8 +568,28 @@ class RGLES2 {
          */
         void drawLine(int x0, int y0, int x1, int y1, color_t color1, color_t color2);
 
-
+        /**
+         * @brief Draw a fast vertical line.
+         * 
+         * @param x0 
+         * @param y0 
+         * @param length 
+         * @param color 
+         * 
+         * This method calls drawLine in RGLES2 renderer
+         */
         void drawFastVLine(int x0, int y0, int length, color_t color);
+
+        /**
+         * @brief Draw a fast horizontal line.
+         * 
+         * @param x0 
+         * @param y0 
+         * @param length 
+         * @param color 
+         * 
+         * This method calls drawLine in RGLES2 renderer
+         */
         void drawFastHLine(int x0, int y0, int length, color_t color);
 
         /**
@@ -591,6 +613,81 @@ class RGLES2 {
          * @param color 
          */
         void drawFillRect(int x, int y, int w, int h, color_t color);
+
+        /**
+         * @brief Draws a circle
+         * 
+         * @param x 
+         * @param y 
+         * @param r 
+         * @param color 
+         */
+        void drawCircle(int x, int y, int r, color_t color);
+
+        /**
+         * @brief Draws a filled circle
+         * 
+         * @param x 
+         * @param y 
+         * @param r 
+         * @param color 
+         */
+        void drawFillCircle(int x, int y, int r, color_t color);
+
+        /**
+         * @brief Draws a filled circle with a color gradient
+         * 
+         * @param x 
+         * @param y 
+         * @param r 
+         * @param color1 
+         * @param color2 
+         */
+        void drawFillCircle(int x, int y, int r, color_t color1, color_t color2);
+
+        /**
+         * @brief Draws a triangle (lines)
+         * 
+         * @param x0 Vertex 1 coordinate
+         * @param y0 Vertex 1 coordinate
+         * @param x1 Vertex 2 coordinate
+         * @param y1 Vertex 2 coordinate
+         * @param x2 Vertex 3 coordinate
+         * @param y2 Vertex 3 coordinate
+         * @param color Triangle line color
+         */
+        void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color);
+
+
+        /**
+         * @brief Draws a filled triangle
+         * 
+         * @param x0 Vertex 1 coordinate
+         * @param y0 Vertex 1 coordinate
+         * @param x1 Vertex 2 coordinate
+         * @param y1 Vertex 2 coordinate
+         * @param x2 Vertex 3 coordinate
+         * @param y2 Vertex 3 coordinate
+         * @param color Triangle fill color
+         */
+        void drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color);
+
+        /**
+         * @brief Draws OpenGL "Hello triangle" style filled triangle
+         * 
+         * @param x0 Vertex 1 coordinate
+         * @param y0 Vertex 1 coordinate
+         * @param x1 Vertex 2 coordinate
+         * @param y1 Vertex 2 coordinate
+         * @param x2 Vertex 3 coordinate
+         * @param y2 Vertex 3 coordinate
+         * @param color1 Color for vertex 1
+         * @param color2 Color for vertex 2
+         * @param color3 Color for vertex 3
+         */
+        void drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color1, color_t color2, color_t color3);
+
+
 };
 
 #endif

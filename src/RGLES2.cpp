@@ -29,6 +29,7 @@
 #include "shaders/glsl_es/basic.h"
 #include "shaders/glsl_es/texture.h"
 
+
 #ifndef sq
 #define sq(x) (((x)*(x)))
 #endif
@@ -1165,6 +1166,8 @@ int RGLES2::init(){
         return -3;
     }
 
+    // Default circle steps
+    this->circle_steps = CIRCLE_STEPS;
     // Renderer mvpMatrix
     this->tMatrix = RMatrix4::ortho(0, this->baseWindow->getWidth(), this->baseWindow->getHeight(), 0, -1, 1);
 
@@ -1597,4 +1600,243 @@ void RGLES2::drawFillRect(int x, int y, int w, int h, color_t color){
     copycolor(&colors[0], color, 6);
 
     this->updateBuffer(buffer, 6, 0, 6, 0);
+}
+
+
+void RGLES2::drawCircle(int x, int y, int r, color_t color){
+    rbufferptr_t e_ptr;
+    void* buffer;
+
+    size_t need_elements = this->circle_steps * 2;
+
+    this->setPipeline(linePipeline);
+    buffer = this->allocateElements(need_elements, &e_ptr);
+
+    vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
+    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+
+    float angle_step = (2.f * M_PI) / (float) this->circle_steps;
+    float angle_now  = 0.f;
+
+    for(int i = 0; i < this->circle_steps; i++){
+        float px1 = (float) x + (float) r * cos(angle_now);
+        float py1 = (float) y + (float) r * sin(angle_now);
+
+        float px2 = (float) x + (float) r * cos(angle_now + angle_step);
+        float py2 = (float) y + (float) r * sin(angle_now + angle_step);
+
+        vertices[i*2 + 0].x = px1;
+        vertices[i*2 + 0].y = py1;
+        vertices[i*2 + 0].z = 0.f;
+
+        vertices[i*2 + 1].x = px2;
+        vertices[i*2 + 1].y = py2;
+        vertices[i*2 + 1].z = 0.f;
+
+        angle_now += angle_step;
+    }
+
+
+    copycolor(&colors[0], color, need_elements);
+    this->updateBuffer(buffer, need_elements, 0, need_elements, 0);
+}
+
+void RGLES2::drawFillCircle(int x, int y, int r, color_t color){
+    rbufferptr_t e_ptr;
+    void* buffer;
+
+    size_t need_elements = this->circle_steps * 3;
+
+    this->setPipeline(trianglePipeline);
+    buffer = this->allocateElements(need_elements, &e_ptr);
+
+    vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
+    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+
+    float angle_step = (2.f * M_PI) / (float) this->circle_steps;
+    float angle_now  = 0.f;
+
+    for(int i = 0; i < this->circle_steps; i++){
+        float px1 = (float) x + (float) r * cos(angle_now);
+        float py1 = (float) y + (float) r * sin(angle_now);
+
+        float px2 = (float) x + (float) r * cos(angle_now + angle_step);
+        float py2 = (float) y + (float) r * sin(angle_now + angle_step);
+
+        vertices[i*3 + 0].x = px1;
+        vertices[i*3 + 0].y = py1;
+        vertices[i*3 + 0].z = 0.f;
+
+        vertices[i*3 + 1].x = px2;
+        vertices[i*3 + 1].y = py2;
+        vertices[i*3 + 1].z = 0.f;
+
+        vertices[i*3 + 2].x = (float) x;
+        vertices[i*3 + 2].y = (float) y;
+        vertices[i*3 + 2].z = 0.f;
+
+        angle_now += angle_step;
+    }
+
+
+    copycolor(&colors[0], color, need_elements);
+    this->updateBuffer(buffer, need_elements, 0, need_elements, 0);
+}
+
+void RGLES2::drawFillCircle(int x, int y, int r, color_t color1, color_t color2){
+    rbufferptr_t e_ptr;
+    void* buffer;
+
+    size_t need_elements = this->circle_steps * 3;
+
+    this->setPipeline(trianglePipeline);
+    buffer = this->allocateElements(need_elements, &e_ptr);
+
+    vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
+    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+
+    color4_t rcolor1;
+    color4_t rcolor2;
+
+    color2rcolor(&rcolor1, color1);
+    color2rcolor(&rcolor2, color2);
+
+    float angle_step = (2.f * M_PI) / (float) this->circle_steps;
+    float angle_now  = 0.f;
+
+    for(int i = 0; i < this->circle_steps; i++){
+        float px1 = (float) x + (float) r * cos(angle_now);
+        float py1 = (float) y + (float) r * sin(angle_now);
+
+        float px2 = (float) x + (float) r * cos(angle_now + angle_step);
+        float py2 = (float) y + (float) r * sin(angle_now + angle_step);
+
+        vertices[i*3 + 0].x = px1;
+        vertices[i*3 + 0].y = py1;
+        vertices[i*3 + 0].z = 0.f;
+
+        vertices[i*3 + 1].x = px2;
+        vertices[i*3 + 1].y = py2;
+        vertices[i*3 + 1].z = 0.f;
+
+        vertices[i*3 + 2].x = (float) x;
+        vertices[i*3 + 2].y = (float) y;
+        vertices[i*3 + 2].z = 0.f;
+
+        // This can be a source of cache misses! Tune for performance
+        // with for example, another for loop with colors
+        colors[i*3 + 0].r = rcolor1.r;
+        colors[i*3 + 0].g = rcolor1.g;
+        colors[i*3 + 0].b = rcolor1.b;
+        colors[i*3 + 0].a = rcolor1.a;
+
+        colors[i*3 + 1].r = rcolor1.r;
+        colors[i*3 + 1].g = rcolor1.g;
+        colors[i*3 + 1].b = rcolor1.b;
+        colors[i*3 + 1].a = rcolor1.a;
+
+        colors[i*3 + 2].r = rcolor2.r;
+        colors[i*3 + 2].g = rcolor2.g;
+        colors[i*3 + 2].b = rcolor2.b;
+        colors[i*3 + 2].a = rcolor2.a;
+
+        angle_now += angle_step;
+    }
+
+
+    this->updateBuffer(buffer, need_elements, 0, need_elements, 0);
+}
+
+void RGLES2::drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color){
+    rbufferptr_t e_ptr;
+    void* buffer;
+
+    this->setPipeline(linePipeline);
+    buffer = this->allocateElements(6, &e_ptr);
+
+    vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
+    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+
+    vertices[0].x = (float) x0;
+    vertices[0].y = (float) y0;
+    vertices[0].z = 0.f;
+
+    vertices[1].x = (float) x1;
+    vertices[1].y = (float) y1;
+    vertices[1].z = 0.f;
+
+    vertices[2].x = (float) x1;
+    vertices[2].y = (float) y1;
+    vertices[2].z = 0.f;
+
+    vertices[3].x = (float) x2;
+    vertices[3].y = (float) y2;
+    vertices[3].z = 0.f;
+
+    vertices[4].x = (float) x2;
+    vertices[4].y = (float) y2;
+    vertices[4].z = 0.f;
+
+    vertices[5].x = (float) x0;
+    vertices[5].y = (float) y0;
+    vertices[5].z = 0.f;
+
+    copycolor(&colors[0], color, 6);
+
+    this->updateBuffer(buffer, 6, 0, 6, 0);
+}
+
+void RGLES2::drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color){
+    rbufferptr_t e_ptr;
+    void* buffer;
+
+    this->setPipeline(trianglePipeline);
+    buffer = this->allocateElements(3, &e_ptr);
+
+    vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
+    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+
+    vertices[0].x = (float) x0;
+    vertices[0].y = (float) y0;
+    vertices[0].z = 0.f;
+
+    vertices[1].x = (float) x1;
+    vertices[1].y = (float) y1;
+    vertices[1].z = 0.f;
+
+    vertices[2].x = (float) x2;
+    vertices[2].y = (float) y2;
+    vertices[2].z = 0.f;
+
+    copycolor(&colors[0], color, 3);
+    this->updateBuffer(buffer, 3, 0, 3, 0);
+}
+
+void RGLES2::drawFillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color1, color_t color2, color_t color3){
+    rbufferptr_t e_ptr;
+    void* buffer;
+
+    this->setPipeline(trianglePipeline);
+    buffer = this->allocateElements(3, &e_ptr);
+
+    vertex3_t* vertices = (vertex3_t*) e_ptr.vtx_ptr;
+    color4_t*  colors   = (color4_t*) e_ptr.clr_ptr;
+
+    vertices[0].x = (float) x0;
+    vertices[0].y = (float) y0;
+    vertices[0].z = 0.f;
+
+    vertices[1].x = (float) x1;
+    vertices[1].y = (float) y1;
+    vertices[1].z = 0.f;
+
+    vertices[2].x = (float) x2;
+    vertices[2].y = (float) y2;
+    vertices[2].z = 0.f;
+
+    color2rcolor(&colors[0], color1);
+    color2rcolor(&colors[1], color2);
+    color2rcolor(&colors[2], color3);
+
+    this->updateBuffer(buffer, 3, 0, 3, 0);
 }
