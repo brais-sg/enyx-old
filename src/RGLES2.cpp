@@ -641,6 +641,30 @@ RTexture::~RTexture(){
     if(this->texture_id) this->destroy();
 }
 
+int RTexture::genMipmaps(){
+    if(this->texture_id){
+        this->attach();
+        glGenerateMipmap(GL_TEXTURE_2D);
+        return 0;
+    } else {
+        Debug::error("[%s:%d]: Texture not initialized for genMipmaps()\n", __FILE__, __LINE__);
+        return 1;
+    }
+}
+
+void RTexture::attach(int texture_unit){
+    glActiveTexture(GL_TEXTURE0 + texture_unit);
+    glBindTexture(GL_TEXTURE_2D, this->texture_id);
+}
+
+void RTexture::attach(){
+    glBindTexture(GL_TEXTURE_2D, this->texture_id);
+}
+
+void RTexture::dettach(){
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void RTexture::destroy(){
     if(this->texture_id){
         glDeleteTextures(1, &this->texture_id);
