@@ -599,6 +599,57 @@ RMatrix4 RMatrix4::frustum(float left, float right, float bottom, float top, flo
     return ret;
 }
 
+// Implement textures!
+RTexture::RTexture(){
+    this->texture_id = 0;
+    this->width      = 0;
+    this->height     = 0;
+    this->components = 0;
+
+    this->s_max = 0.f;
+    this->t_max = 0.f;
+}
+
+RTexture::RTexture(Pixmap& pixmap){
+    // Generate and upload a new texture from pixmap
+    Debug::info("[%s:%d]: Generating a new texture from pixmap\n", __FILE__, __LINE__);
+    glGenTextures(1, &this->texture_id);
+    if(this->texture_id){
+        glActiveTexture(GL_TEXTURE0 + 0);
+        glBindTexture(GL_TEXTURE_2D, this->texture_id);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        if(pixmap.getBpp() == 4){
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+        } else {
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        }
+        // Copy pixels to texture (Upload!)
+        glTexImage2D(GL_TEXTURE_2D, 0, pixmap.getBpp() == 4 ? GL_RGBA : GL_RGB, pixmap.getWidth(), pixmap.getHeight(), 0, pixmap.getBpp() == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, pixmap.getPixmap());
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+    } else {
+        Debug::error("[%s:%d]: Cannot generate texture!\n", __FILE__, __LINE__);
+    }
+}
+
+RTexture::~RTexture(){
+    if(this->texture_id) this->destroy();
+}
+
+void RTexture::destroy(){
+    if(this->texture_id){
+        glDeleteTextures(1, &this->texture_id);
+        this->texture_id = 0;
+    } else {
+        Debug::warning("[%s:%d]: Trying to delete an already deleted texture!\n", __FILE__, __LINE__);
+    }
+}
+
 // STEP 2: Implement base structs: In the header
 // STEP 3: Implement shader class
 

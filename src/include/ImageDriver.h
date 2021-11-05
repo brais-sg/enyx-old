@@ -17,11 +17,11 @@
 #include <stdint.h>
 
 typedef void (*progress_callback_t)(float);
-static progress_callback_t callback_fnc = NULL;
-
 namespace ID {
-    int      infoImage(const char* fileName, int* sx, int* sy, int* n);
-    uint8_t* loadImage(const char* fileName, int* sx, int* sy, int* n);
+    static progress_callback_t callback_fnc = NULL;
+
+    int      infoImage (const char* fileName, int* sx, int* sy, int* n);
+    uint8_t* loadImage (const char* fileName, int* sx, int* sy, int* n);
     float*   loadImageF(const char* fileName, int* sx, int* sy, int* n);
     // TODO: Load from memory
 

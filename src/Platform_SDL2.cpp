@@ -18,6 +18,7 @@
 #include <SDL2/SDL.h>
 
 #include "Platform_SDL2.h"
+#include "Debug.h"
 
 // EVENT SYSTEM CALLBACKS
 static Window*  default_window = NULL;
@@ -54,7 +55,7 @@ static void eventSystemCB_touchEventHandler(void* data){
 }
 
 static void eventSystemCB_exitEventHandler(void* data){
-    fprintf(stderr, "[%s:%d] INFO: Exit event handler called!\n",__FILE__, __LINE__);
+    Debug::info("[%s:%d] Exit event handler called!\n",__FILE__, __LINE__);
     // Exit event received, 
     app_running = false;
 }
@@ -130,7 +131,7 @@ void Events::processEvents(){
                 if(event_handlers.exit_handler) event_handlers.exit_handler(&e);
                 break;
             default:
-                fprintf(stderr,"[%s:%d]: INFO: Unknown event\n", __FILE__, __LINE__);
+                Debug::info("[%s:%d]: Unknown event\n", __FILE__, __LINE__);
         }
     }
 }
@@ -163,7 +164,7 @@ void Events::attachCallback(event_t event, event_cb_t event_cb){
             event_handlers.exit_handler       = event_cb;
             break;
         default:
-            fprintf(stderr, "[%s:%d] Events::attachCallback(): WARNING: Unknown event type.\n", __FILE__, __LINE__);
+            Debug::warning("[%s:%d] Events::attachCallback(): WARNING: Unknown event type.\n", __FILE__, __LINE__);
     }
 }
 
@@ -175,7 +176,7 @@ event_info_t Events::getEventsInfo(){
 // Init Enyx GL subsystems (And SDL)
 int Enyx::init(){
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
-        fprintf(stderr, "[%s:%d]: FATAL: Cannot init SDL2: Error: %s\n", __FILE__, __LINE__, SDL_GetError());
+        Debug::error("[%s:%d]: FATAL: Cannot init SDL2: Error: %s\n", __FILE__, __LINE__, SDL_GetError());
         exit(-1);
         return -1; // Never reached
     }
@@ -297,14 +298,14 @@ int Window::init(const char* title){
         if(default_window == NULL) default_window = this;
         return 0;
     } else {
-        fprintf(stderr, "[%s:%d] ERROR: Cannot create Window! Error: %s\n", __FILE__,__LINE__, SDL_GetError());
+        Debug::error("[%s:%d]: Cannot create Window! Error: %s\n", __FILE__,__LINE__, SDL_GetError());
         return -1;
     }
 }
 
 void Window::close(){
     if(default_window) default_window = NULL;
-    fprintf(stderr, "[%s:%d]: INFO: Deleting window %p\n", __FILE__, __LINE__, this);
+    Debug::info("[%s:%d]: Deleting window %p\n", __FILE__, __LINE__, this);
     SDL_DestroyWindow(this->window);
     this->window = NULL;
 }
@@ -342,13 +343,10 @@ void Window::setTitle(const char* title){
 //  2. Android device, fullscreen
 //  3. Raspberry Pi in video framebuffer mode
 bool Window::isResizable(){
-    if(SDL_GetWindowFlags(this->window) & SDL_WINDOW_RESIZABLE){
-        return true;
-    }
+    if(SDL_GetWindowFlags(this->window) & SDL_WINDOW_RESIZABLE) return true;
+    
 
-    if(strcmp(SDL_GetPlatform(), "Android") == 0){
-        return false;
-    }
+    // if(strcmp(SDL_GetPlatform(), "Android") == 0) return false;
 
     return false;
 }

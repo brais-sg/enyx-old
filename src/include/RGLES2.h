@@ -15,6 +15,7 @@
 #define _RGLES2_INCLUDED
 #include "AGL.h"
 #include "Platform_SDL2.h"
+#include "Pixmap.h"
 #include <GLES2/gl2.h>
 
 #ifndef _BV
@@ -128,6 +129,40 @@ class RMatrix4 {
 
         // This is not going to be a 3D engine, right?
         static RMatrix4 frustum(float left, float right, float bottom, float top, float znear, float zfar);
+};
+
+
+class RTexture {
+    private:
+        GLuint texture_id;
+
+        int width, height, components;
+        float s_max, t_max;
+    public:
+        RTexture();
+        RTexture(Pixmap& pixmap);
+        ~RTexture();
+
+        int genMipmaps();
+
+        // Attach
+        void attach(int texture_unit);
+        void attach();
+        void dettach();
+
+        // Destroy
+        void destroy();
+
+        // Get dimensions in texels!
+        int getWidth()      const;
+        int getHeight()     const;
+        int getComponents() const;
+
+        // Get texture border in texture space (s,t) (0-1) (Normally 1.f)
+        float getSBorder() const;
+        float getTBorder() const;
+
+        static RTexture loadImage(const char* fileName);
 };
 
 // Renderer base structs

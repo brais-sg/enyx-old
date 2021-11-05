@@ -34,8 +34,11 @@ class Pixmap {
         uint16_t getWidth()  const;
         uint16_t getHeight() const;
         uint8_t  getBpp()    const;
-
+        
         void* getPixmap();
+        int   saveImage();
+
+        static Pixmap loadImage(const char* fileName);
 };
 
 #endif

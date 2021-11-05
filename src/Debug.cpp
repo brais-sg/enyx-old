@@ -17,7 +17,7 @@
 
 void Debug::info(const char* format, ...){
     va_list args;
-    fprintf(stdout, "[INFO]: ");
+    fprintf(stdout, COLOR_BLUE "[INFO]: " COLOR_RESET);
     va_start(args, format);
     vfprintf(stdout, format, args);
     va_end(args);
@@ -25,7 +25,7 @@ void Debug::info(const char* format, ...){
 
 void Debug::warning(const char* format, ...){
     va_list args;
-    fprintf(stderr, "[WARN]: ");
+    fprintf(stderr, COLOR_YELLOW "[WARN]: " COLOR_RESET);
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
@@ -33,18 +33,21 @@ void Debug::warning(const char* format, ...){
 
 void Debug::error(const char* format, ...){
     va_list args;
-    fprintf(stderr, "[ERROR]: ");
+    fprintf(stderr, COLOR_RED "[ERROR]: ");
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
+
+    fprintf(stderr,"%s",COLOR_RESET);
 }
 
 void Debug::critical(const char* format, ...){
     va_list args;
-    fprintf(stderr, "[CRITICAL]: ");
+    fprintf(stderr, COLOR_RED "[CRITICAL]: ");
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
+    fprintf(stderr,"%s",COLOR_RESET);
     exit(-1);
 }
 

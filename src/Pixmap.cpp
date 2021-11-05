@@ -13,9 +13,10 @@
 #include <string.h>
 
 #include "Pixmap.h"
+#include "ImageDriver.h"
 
 Pixmap::Pixmap(){
-    this->pm = NULL;
+    this->pm     = NULL;
     this->width  = 0;
     this->height = 0;
     this->bpp    = 0;

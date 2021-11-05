@@ -26,9 +26,7 @@
 #include "stb/stb_image_write.h"
 
 static void _id_progress_report(float progress){
-    if(callback_fnc){
-        callback_fnc(progress);
-    }
+    if(ID::callback_fnc) ID::callback_fnc(progress);
 }
 
 #define STBIR_PROGRESS_REPORT(val) _id_progress_report(val)
@@ -104,7 +102,7 @@ int ID::writeImage(const char* fileName, int w, int h, int n, void* data, int q)
 }
 
 void ID::resizingCallback(progress_callback_t callback){
-    callback_fnc = callback;
+    ID::callback_fnc = callback;
 }
 
 int ID::resizeImage(void* input, int in_w, int in_h, void* output, int out_w, int out_h, int n){
