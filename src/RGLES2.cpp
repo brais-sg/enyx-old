@@ -27,6 +27,7 @@
 
 // Internal shaders
 #include "shaders/glsl_es/basic.h"
+#include "shaders/glsl_es/point.h"
 #include "shaders/glsl_es/texture.h"
 
 
@@ -803,7 +804,7 @@ static void zeroBufferElements(void* buffer){
 // Dot pipeline
 RDotPipeline::RDotPipeline(){
     // Compile internal shader
-    this->internalShader = new RShader(basic_vert, basic_frag);
+    this->internalShader = new RShader(point_vert, point_frag);
 }
 
 RDotPipeline::~RDotPipeline(){
