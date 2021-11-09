@@ -17,7 +17,7 @@
 #include <stdint.h>
 
 typedef void (*progress_callback_t)(float);
-namespace ID {
+namespace ImageDriver {
     static progress_callback_t callback_fnc = NULL;
 
     int      infoImage (const char* fileName, int* sx, int* sy, int* n);

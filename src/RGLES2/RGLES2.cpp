@@ -22,13 +22,15 @@
 #include <GLES2/gl2ext.h>
 
 #include "AGL.h"
-#include "RGLES2.h"
+#include "RGLES2/RGLES2.h"
 #include "Debug.h"
+#include "Pixmap.h"
+#include "ImageDriver.h"
 
 // Internal shaders
-#include "shaders/glsl_es/basic.h"
-#include "shaders/glsl_es/point.h"
-#include "shaders/glsl_es/texture.h"
+#include "RGLES2/shaders/basic.h"
+#include "RGLES2/shaders/point.h"
+#include "RGLES2/shaders/texture.h"
 
 
 #ifndef sq
@@ -608,6 +610,13 @@ RTexture::RTexture(){
 
     this->s_max = 0.f;
     this->t_max = 0.f;
+
+    this->top    = 0.f;
+    this->bottom = 0.f;
+    this->right  = 0.f;
+    this->left   = 0.f;
+
+    this->flipped = false;
 }
 
 RTexture::RTexture(Pixmap& pixmap){
@@ -620,6 +629,7 @@ RTexture::RTexture(Pixmap& pixmap){
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -630,6 +640,17 @@ RTexture::RTexture(Pixmap& pixmap){
         }
         // Copy pixels to texture (Upload!)
         glTexImage2D(GL_TEXTURE_2D, 0, pixmap.getBpp() == 4 ? GL_RGBA : GL_RGB, pixmap.getWidth(), pixmap.getHeight(), 0, pixmap.getBpp() == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, pixmap.getPixmap());
+        // Setup texture parameters
+        this->width      = pixmap.getWidth();
+        this->height     = pixmap.getHeight();
+        this->components = pixmap.getBpp();
+
+        this->top        = 1.f;
+        this->bottom     = 0.f;
+        this->left       = 0.f;
+        this->right      = 1.f;
+
+        this->flipped    = false;
 
         glBindTexture(GL_TEXTURE_2D, 0);
     } else {
@@ -672,6 +693,51 @@ void RTexture::destroy(){
     } else {
         Debug::warning("[%s:%d]: Trying to delete an already deleted texture!\n", __FILE__, __LINE__);
     }
+}
+
+int RTexture::getWidth() const {
+    return this->width;
+}
+
+int RTexture::getHeight() const {
+    return this->height;
+}
+
+int RTexture::getComponents() const {
+    return this->components;
+}
+
+float RTexture::getSBorder() const {
+    return this->s_max;
+}
+
+float RTexture::getTBorder() const {
+    return this->t_max;
+}
+
+bool RTexture::isFlipped() const {
+    return this->flipped;
+}
+
+float RTexture::Top() const {
+    return this->top;
+}
+
+float RTexture::Bottom() const {
+    return this->bottom;
+}
+
+float RTexture::Left() const {
+    return this->left;
+}
+
+float RTexture::Right() const {
+    return this->right;
+}
+
+RTexture RTexture::loadImage(const char* fileName){
+    int sx, sy, cmp;
+    uint8_t* image = ImageDriver::loadImage(fileName, &sx, &sy, &cmp);
 }
 
 // STEP 2: Implement base structs: In the header

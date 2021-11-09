@@ -53,6 +53,7 @@ typedef uint32_t rgba_t;
 #define ORANGE    RGB(255,165,0)
 
 
+
 // AGL Interface (Adafruit GFX-Like API). All Enyx versions will have this API
 class AGL {
     public:
@@ -116,14 +117,30 @@ class AGL {
         // Render / submit
         virtual void submit() = 0;  // Submit buffers to GPU in hardware-accelerated contexts (Also updates matrix transform!)
         virtual void render()  = 0; // Force render (waits for renderer (glFlush & glFinish on OpenGL contexts)) 
-
-
 };
 
+// Texture API
+class AGL_Texture {
+    public:
+        virtual ~AGL_Texture();
 
+        virtual void attach();
+        virtual void attach(int texture_unit);
+        virtual void dettach();
 
+        virtual int getWidth()  const;
+        virtual int getHeight() const;
 
+        virtual float getSBorder() const;
+        virtual float getTBorder() const;
 
+        virtual float Right()  const;
+        virtual float Left()   const;
+        virtual float Top()    const;
+        virtual float Bottom() const;
+
+        virtual bool isFlipped() const;
+};
 
 
 

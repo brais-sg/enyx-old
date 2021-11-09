@@ -13,5 +13,10 @@
 #include "Pixmap.h"
 #include "ImageDriver.h"
 #include "Platform_SDL2.h"
-#include "Renderer_SDL2_GLES2.h"
-#include "RGLES2.h"
+// #include "Renderer_SDL2_GLES2.h"
+
+#ifdef GL1_BUILD
+#include "RGL1/RGL1.h"
+#else
+#include "RGLES2/RGLES2.h"
+#endif

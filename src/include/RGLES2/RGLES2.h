@@ -131,19 +131,24 @@ class RMatrix4 {
         static RMatrix4 frustum(float left, float right, float bottom, float top, float znear, float zfar);
 };
 
-
+// OpenGL Renderer Texture implemetation. Internal use only
 class RTexture {
     private:
         GLuint texture_id;
 
         int width, height, components;
         float s_max, t_max;
+
+        float left, right, top, bottom;
+        bool flipped;
     public:
         RTexture();
+        RTexture(int width, int heigth, int comp);
         RTexture(Pixmap& pixmap);
         ~RTexture();
 
-        int genMipmaps();
+        int  genMipmaps();
+        void uploadPixels(int px, int py, int width, int height, int cmp, void* pixels);
 
         // Attach
         void attach(int texture_unit);
@@ -161,6 +166,13 @@ class RTexture {
         // Get texture border in texture space (s,t) (0-1) (Normally 1.f)
         float getSBorder() const;
         float getTBorder() const;
+
+        float Right()  const;
+        float Left()   const;
+        float Top()    const;
+        float Bottom() const;
+
+        bool isFlipped() const;
 
         static RTexture loadImage(const char* fileName);
 };
@@ -388,6 +400,8 @@ class RGLES2 {
         RLinePipeline*     linePipeline;
         RTrianglePipeline* trianglePipeline;
         // RTexturePipeline*  texturePipeline;
+        // Probably pixelWidth and lineWidth
+        // Point sprites will be supported!
 
         // Renderer info struct 
         rgles2info_t gles2_info;
