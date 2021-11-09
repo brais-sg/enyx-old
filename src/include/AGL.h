@@ -53,7 +53,6 @@ typedef uint32_t rgba_t;
 #define ORANGE    RGB(255,165,0)
 
 
-
 // AGL Interface (Adafruit GFX-Like API). All Enyx versions will have this API
 class AGL {
     public:

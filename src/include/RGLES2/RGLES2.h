@@ -18,118 +18,16 @@
 #include "Pixmap.h"
 #include <GLES2/gl2.h>
 
-#ifndef _BV
-#define _BV(x) ((1) << (x))
-#endif
-
-#ifndef DEG2RAD
-#define DEG2RAD(x) ((x) * M_PI / 180.f);
-#endif
-
-#define DEFAULT_DRAW_BUFFER_SIZE_ELEMENTS 512
-#define CIRCLE_STEPS 32
+// RGLES2
+#include "RGLES2/RVector2i.h"
+#include "RGLES2/RVector2.h"
+#include "RGLES2/RMatrix4.h"
+#include "RGLES2/RUtils.h"
+#include "RGLES2/RConstants.h"
 
 #define rmalloc(n)    malloc(n)
 #define rrealloc(p,n) realloc(p,n)
 #define rfree(p)      free(p)
-
-// Renderer base classes definition
-class RVector2i {
-    public:
-        int x, y;
-
-        RVector2i();
-        RVector2i(int x, int y);
-        RVector2i(const RVector2i& other);
-
-        RVector2i operator+(const RVector2i& other) const;
-        RVector2i operator-(const RVector2i& other) const;
-        RVector2i operator*(float scalar) const;
-
-        RVector2i& operator+=(const RVector2i& other);
-        RVector2i& operator-=(const RVector2i& other);
-        RVector2i& operator=(const RVector2i& other);
-        RVector2i& operator*=(float scalar);
-        RVector2i& normalize();
-
-        RVector2i normalized() const;
-
-        float length()   const;
-        float sqLength() const;
-        float angle()    const;
-
-        static float dot(const RVector2i& v1, const RVector2i& v2);
-        static RVector2i lerp(const RVector2i& v1, const RVector2i& v2, float n);
-
-};
-
-class RVector2 {
-    public:
-        float x, y;
-
-        RVector2();
-        RVector2(float x, float y);
-        RVector2(const RVector2& other);
-        RVector2(const RVector2i& other);
-
-        RVector2 operator+(const RVector2& other) const;
-        RVector2 operator-(const RVector2& other) const;
-        RVector2 operator*(float scalar) const;
-
-        RVector2& operator+=(const RVector2& other);
-        RVector2& operator-=(const RVector2& other);
-        RVector2& operator=(const RVector2& other);
-        RVector2& operator*=(float scalar);
-        RVector2& normalize();
-
-        RVector2 normalized() const;
-
-        float length()   const;
-        float sqLength() const;
-        float angle()    const;
-
-        static float dot(const RVector2& v1, const RVector2& v2);
-        static RVector2 lerp(const RVector2& v1, const RVector2& v2, float n);
-};
-
-class RMatrix4 {
-    public:
-        float e[16];
-
-        RMatrix4();
-        RMatrix4(const RMatrix4& other);
-
-        RMatrix4 operator+(const RMatrix4& other) const;
-        RMatrix4 operator-(const RMatrix4& other) const;
-        RMatrix4 operator*(const RMatrix4& other) const;
-        RMatrix4 operator*(float scalar) const;
-
-        RMatrix4& operator+=(const RMatrix4& other);
-        RMatrix4& operator-=(const RMatrix4& other);
-        RMatrix4& operator*=(const RMatrix4& other);
-        RMatrix4& operator=(const RMatrix4& other);
-        RMatrix4& operator*=(float scalar);
-
-        // Methods
-
-        float* getArray();
-        void   loadIdentity();
-
-        static RMatrix4 translation(float tx, float ty);
-
-        // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
-        static RMatrix4 translation(float tx, float ty, float tz);
-        static RMatrix4 rotation(float angle);
-        static RMatrix4 scaling(float sx, float sy);
-
-        // Do not use for now! Enyx is NOT intended to be a 3D graphics engine (yet)
-        static RMatrix4 scaling(float sx, float sy, float sz); 
-
-        static RMatrix4 ortho(float left, float right, float bottom, float top, float znear, float zfar);
-
-        // This is not going to be a 3D engine, right?
-        static RMatrix4 frustum(float left, float right, float bottom, float top, float znear, float zfar);
-};
 
 // OpenGL Renderer Texture implemetation. Internal use only
 class RTexture {
