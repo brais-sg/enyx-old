@@ -29,6 +29,15 @@ Pixmap::Pixmap(){
     this->loader     = PIXMAP_LOADER_NONE;
 }
 
+Pixmap::Pixmap(void* px, int width, int height, int components, int loader){
+    this->px         = (uint8_t*) px;
+    this->width      = width;
+    this->height     = height;
+    this->components = components;
+    this->loader     = loader;
+}
+
+
 Pixmap::Pixmap(const char* fileName){
     this->px = ImageDriver::loadImage(fileName, &this->width, &this->height, &this->components);
     if(this->px){
@@ -93,6 +102,14 @@ Pixmap::operator bool() const {
 
 void* Pixmap::getPixels() const {
     return (void*) this->px;
+}
+
+void Pixmap::copyPixels(void* from, size_t size){
+    if(this && this->isModifiable()){
+        memcpy(this->px, from, size);
+    } else {
+        if(!this->isModifiable()) Debug::error("[%s:%d]: Attempting to modify a static pixmap!\n", __FILE__, __LINE__);
+    }
 }
 
 void Pixmap::free(){
@@ -184,15 +201,35 @@ void Pixmap::fill(color_t color){
 
 void Pixmap::flipHorizontally(){
     if(this && this->isModifiable()){
-        
+        for(int y = 0; y < (this->height >> 1); y++){
+            for(int x = 0; x < this->width; x++){
+                color_t px1 = this->getPixel(x, y);
+                color_t px2 = this->getPixel(x, this->height - y);
 
-
+                this->setPixel(x, y, px2);
+                this->setPixel(x, this->height - y, px1);
+            }
+        }
     } else {
         if(!this->isModifiable()) Debug::error("[%s:%d]: Attempting to modify a static pixmap!\n", __FILE__, __LINE__);
     }
 }
 
+void Pixmap::flipVertically(){
+    if(this && this->isModifiable()){
+        for(int y = 0; y < this->height; y++){
+            for(int x = 0; x < (this->width >> 1); x++){
+                color_t px1 = this->getPixel(x, y);
+                color_t px2 = this->getPixel(this->width - x, this->height);
 
+                this->setPixel(x, y, px2);
+                this->setPixel(this->width - x, y, px1);
+            }
+        }
+    } else {
+        if(!this->isModifiable()) Debug::error("[%s:%d]: Attempting to modify a static pixmap!\n", __FILE__, __LINE__);
+    }
+}
 
 
 color_t Pixmap::getPixel(int px, int py){
@@ -280,5 +317,27 @@ int Pixmap::getBPP() const {
 // Load image
 Pixmap Pixmap::loadImage(const char* fileName){
     return Pixmap(fileName);
+}
+
+Pixmap Pixmap::loadArray(void* px_ptr, int width, int height, int components){
+    Pixmap pixmap;
+    Debug::info("[%s:%d]: Allocating a pixmap from array %p\n", __FILE__, __LINE__, px_ptr);
+    pixmap.allocate(width, height, components);
+    pixmap.copyPixels(px_ptr, width * height * components);
+
+    return pixmap;
+}
+
+Pixmap Pixmap::loadStaticArray(void* px_ptr, int width, int height, int components){
+    Debug::info("[%s:%d]: Allocating a static pixmap from array %p\n", __FILE__, __LINE__, px_ptr);
+    Pixmap pixmap(px_ptr, width, height, components, PIXMAP_LOADER_NONE);
+    return pixmap;
+}
+
+void Pixmap::saveImage(const char* fileName, const Pixmap& pixmap){
+    Debug::info("[%s:%d]: Saving image to file %s\n", fileName);
+    if(ImageDriver::writeImage(fileName, pixmap.getWidth(), pixmap.getHeight(), pixmap.getComponents(), pixmap.getPixels())){
+        Debug::error("[%s:%d]: Cannot save image to file %s\n", __FILE__, __LINE__, fileName);
+    }
 }
 

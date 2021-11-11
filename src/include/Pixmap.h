@@ -27,6 +27,8 @@ class Pixmap {
         int width, height, components, loader;
     public:
         Pixmap();
+        // Constructor for static array! Do not use
+        Pixmap(void* px, int width, int height, int components, int loader);
         // Load from image (ImageDriver)
         Pixmap(const char* fileName);
         Pixmap(const Pixmap& other);
@@ -39,6 +41,9 @@ class Pixmap {
 
         // Get pixel array
         void* getPixels() const;
+
+        // Copy pixels to array
+        void copyPixels(void* from, size_t size);
 
         // Free image storage (Does nothing on static)
         void free();
@@ -65,10 +70,11 @@ class Pixmap {
         int getDepth()      const;
         int getBPP()        const;
 
-
+        
         static Pixmap loadImage(const char* fileName);
         static Pixmap loadArray(void* px_ptr, int width, int height, int components);
         static Pixmap loadStaticArray(void* px_ptr, int width, int height, int components);
+        static void   saveImage(const char* fileName, const Pixmap& pixmap);
 };
 
 #endif
