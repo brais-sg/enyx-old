@@ -226,11 +226,53 @@ color_t Pixmap::getPixel(int px, int py){
 
 void Pixmap::setPixel(int px, int py, color_t color){
     if(this && this->isModifiable()){
-        
-
-
-
+        int offset = (this->components * this->width * py) + (this->components * px);
+        switch(this->components){
+            case 1:
+                this->px[offset + 0] = R(color);
+                break;
+            case 2:
+                this->px[offset + 0] = R(color);
+                this->px[offset + 1] = G(color);
+                break;
+            case 3:
+                this->px[offset + 0] = R(color);
+                this->px[offset + 1] = G(color);
+                this->px[offset + 2] = B(color);
+                break;
+            case 4:
+                this->px[offset + 0] = R(color);
+                this->px[offset + 1] = G(color);
+                this->px[offset + 2] = B(color);
+                this->px[offset + 3] = A(color);
+                break;
+            default:
+                break;
+        }
     } else {
         if(!this->isModifiable()) Debug::error("[%s:%d]: Attempting to modify a static pixmap!\n", __FILE__, __LINE__);
     }
 }
+
+int Pixmap::getWidth() const {
+    return this->width;
+}
+
+int Pixmap::getHeight() const {
+    return this->height;
+}
+
+int Pixmap::getComponents() const {
+    return this->components;
+}
+
+int Pixmap::getDepth() const {
+    return this->components * 8;
+}
+
+// This method is here for legacy purposes.
+// This will be deprecated. Use getDepth instead
+int Pixmap::getBPP() const {
+    return this->getDepth();
+}
+
