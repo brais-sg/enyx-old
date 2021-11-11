@@ -68,9 +68,9 @@ class Pixmap {
         int getHeight()     const;
         int getComponents() const;
         int getDepth()      const;
-        int getBPP()        const;
+        int getBpp()        const;
 
-        
+
         static Pixmap loadImage(const char* fileName);
         static Pixmap loadArray(void* px_ptr, int width, int height, int components);
         static Pixmap loadStaticArray(void* px_ptr, int width, int height, int components);

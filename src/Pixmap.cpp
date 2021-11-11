@@ -309,7 +309,7 @@ int Pixmap::getDepth() const {
 
 // This method is here for legacy purposes.
 // This will be deprecated. Use getDepth instead
-int Pixmap::getBPP() const {
+int Pixmap::getBpp() const {
     return this->getDepth();
 }
 

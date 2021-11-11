@@ -35,11 +35,9 @@ class RMatrix3 {
         float* getArray();
         void   loadIdentity();
 
-
-
-
-
-
+        static RMatrix3 translation(float tx, float ty);
+        static RMatrix3 rotation(float angle);
+        static RMatrix3 scaling(float sx, float sy);
 };
 
 #endif

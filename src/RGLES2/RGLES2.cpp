@@ -639,7 +639,7 @@ RTexture::RTexture(Pixmap& pixmap){
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         }
         // Copy pixels to texture (Upload!)
-        glTexImage2D(GL_TEXTURE_2D, 0, pixmap.getBpp() == 4 ? GL_RGBA : GL_RGB, pixmap.getWidth(), pixmap.getHeight(), 0, pixmap.getBpp() == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, pixmap.getPixmap());
+        glTexImage2D(GL_TEXTURE_2D, 0, pixmap.getBpp() == 4 ? GL_RGBA : GL_RGB, pixmap.getWidth(), pixmap.getHeight(), 0, pixmap.getBpp() == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, pixmap.getPixels());
         // Setup texture parameters
         this->width      = pixmap.getWidth();
         this->height     = pixmap.getHeight();
