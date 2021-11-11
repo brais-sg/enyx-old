@@ -182,9 +182,9 @@ void Pixmap::fill(color_t color){
 }
 
 
-int Pixmap::flipHorizontally(){
+void Pixmap::flipHorizontally(){
     if(this && this->isModifiable()){
-
+        
 
 
     } else {
@@ -274,5 +274,11 @@ int Pixmap::getDepth() const {
 // This will be deprecated. Use getDepth instead
 int Pixmap::getBPP() const {
     return this->getDepth();
+}
+
+
+// Load image
+Pixmap Pixmap::loadImage(const char* fileName){
+    return Pixmap(fileName);
 }
 

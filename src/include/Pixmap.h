@@ -52,9 +52,9 @@ class Pixmap {
         // Fill image
         void fill(color_t color);
 
-        // Only allowed with dynamic storage. Returns 1 on error
-        int flipHorizontally();
-        int flipVertically();
+        // Only allowed with dynamic storage.
+        void flipHorizontally();
+        void flipVertically();
 
         color_t getPixel(int px, int py);
         void    setPixel(int px, int py, color_t color);
@@ -66,9 +66,9 @@ class Pixmap {
         int getBPP()        const;
 
 
-        static Pixmap fromImage(const char* fileName);
-        static Pixmap fromArray(void* px_ptr, int width, int height, int components);
-        static Pixmap fromStaticArray(void* px_ptr, int width, int height, int components);
+        static Pixmap loadImage(const char* fileName);
+        static Pixmap loadArray(void* px_ptr, int width, int height, int components);
+        static Pixmap loadStaticArray(void* px_ptr, int width, int height, int components);
 };
 
 #endif
