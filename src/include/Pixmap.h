@@ -37,7 +37,7 @@ class Pixmap {
         bool onImage(int px, int py) const;
         bool isModifiable()          const;
         
-        operator bool() const;
+        bool exists() const;
 
         // Get pixel array
         void* getPixels() const;

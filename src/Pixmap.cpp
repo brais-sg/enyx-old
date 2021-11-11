@@ -95,8 +95,7 @@ bool Pixmap::isModifiable() const {
     return (this->loader != PIXMAP_LOADER_NONE);
 }
 
-
-Pixmap::operator bool() const {
+bool Pixmap::exists() const {
     return (this->px != NULL);
 }
 
@@ -105,7 +104,7 @@ void* Pixmap::getPixels() const {
 }
 
 void Pixmap::copyPixels(void* from, size_t size){
-    if(this && this->isModifiable()){
+    if(this->exists() && this->isModifiable()){
         memcpy(this->px, from, size);
     } else {
         if(!this->isModifiable()) Debug::error("[%s:%d]: Attempting to modify a static pixmap!\n", __FILE__, __LINE__);
@@ -133,7 +132,7 @@ void Pixmap::free(){
 }
 
 void Pixmap::allocate(int width, int height, int components){
-    if(this) this->free();
+    if(this->exists()) this->free();
 
     this->px = (uint8_t*) malloc(width * height * components);
     if(this->px){
@@ -157,13 +156,13 @@ void Pixmap::allocate(int width, int height, int components){
 }
 
 void Pixmap::clear(){
-    if(this && this->isModifiable()){
+    if(this->exists() && this->isModifiable()){
         memset(this->px, 0, this->width * this->height * this->components);
     }
 }
 
 void Pixmap::fill(color_t color){
-    if(this && this->isModifiable()){
+    if(this->exists() && this->isModifiable()){
         switch(this->components){
             case 1:
                 memset(this->px, R(color), this->width * this->height * this->components);
@@ -200,7 +199,7 @@ void Pixmap::fill(color_t color){
 
 
 void Pixmap::flipHorizontally(){
-    if(this && this->isModifiable()){
+    if(this->exists() && this->isModifiable()){
         for(int y = 0; y < (this->height >> 1); y++){
             for(int x = 0; x < this->width; x++){
                 color_t px1 = this->getPixel(x, y);
@@ -216,7 +215,7 @@ void Pixmap::flipHorizontally(){
 }
 
 void Pixmap::flipVertically(){
-    if(this && this->isModifiable()){
+    if(this->exists() && this->isModifiable()){
         for(int y = 0; y < this->height; y++){
             for(int x = 0; x < (this->width >> 1); x++){
                 color_t px1 = this->getPixel(x, y);
@@ -233,7 +232,7 @@ void Pixmap::flipVertically(){
 
 
 color_t Pixmap::getPixel(int px, int py){
-    if(this){
+    if(this->exists()){
         if(onImage(px, py)){
             // Image is stored in big endian mode [R G B A]
             int offset = (this->components * this->width * py) + (this->components * px);
@@ -262,7 +261,7 @@ color_t Pixmap::getPixel(int px, int py){
 
 
 void Pixmap::setPixel(int px, int py, color_t color){
-    if(this && this->isModifiable()){
+    if(this->exists() && this->isModifiable()){
         int offset = (this->components * this->width * py) + (this->components * px);
         switch(this->components){
             case 1:
