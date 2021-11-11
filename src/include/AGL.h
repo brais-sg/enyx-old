@@ -119,9 +119,9 @@ class AGL {
 };
 
 // Texture API
-class AGL_Texture {
+class AGLT {
     public:
-        virtual ~AGL_Texture();
+        virtual ~AGLT();
 
         virtual void attach();
         virtual void attach(int texture_unit);
