@@ -59,7 +59,7 @@ class AGLT {
         virtual ~AGLT();
 
         virtual void attach();
-        virtual void attach(int texture_unit);
+        virtual void attach(int texture_image_unit);
         virtual void dettach();
 
         virtual int getWidth()  const;
@@ -68,12 +68,15 @@ class AGLT {
         virtual float getSBorder() const;
         virtual float getTBorder() const;
 
-        virtual float Right()  const;
-        virtual float Left()   const;
         virtual float Top()    const;
         virtual float Bottom() const;
+        virtual float Right()  const;
+        virtual float Left()   const;
 
-        virtual bool isFlipped() const;
+        // Translate, rotate, scale if needed
+        virtual void translate(float tx, float ty);
+        virtual void rotate(float angle);
+        virtual void scale(float sx, float sy);
 };
 
 // AGL Interface (Adafruit GFX-Like API). All Enyx versions will support this API
