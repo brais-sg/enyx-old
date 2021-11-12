@@ -55,7 +55,7 @@ static void eventSystemCB_touchEventHandler(void* data){
 }
 
 static void eventSystemCB_exitEventHandler(void* data){
-    Debug::info("[%s:%d] Exit event handler called!\n",__FILE__, __LINE__);
+    Debug::info("[%s:%d]: Exit event handler called!\n",__FILE__, __LINE__);
     // Exit event received, 
     app_running = false;
 }
