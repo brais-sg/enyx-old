@@ -136,7 +136,7 @@ void Pixmap::allocate(int width, int height, int components){
 
     this->px = (uint8_t*) malloc(width * height * components);
     if(this->px){
-        Debug::info("[%s:%d]: Allocated %d bytes for image\n", width * height * components);
+        Debug::info("[%s:%d]: Allocated %d bytes for image\n", __FILE__, __LINE__, width * height * components);
         
         this->width      = width;
         this->height     = height;
@@ -189,7 +189,7 @@ void Pixmap::fill(color_t color){
                 }
                 break;
             default:
-                Debug::warning("[%s:%d]: Aborting fill operation. Unknown image components: %d\n", this->components);
+                Debug::warning("[%s:%d]: Aborting fill operation. Unknown image components: %d\n", __FILE__, __LINE__, this->components);
                 break;
         }
     } else {
