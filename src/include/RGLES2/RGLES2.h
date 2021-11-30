@@ -24,6 +24,15 @@
 #include "RGLES2/RMatrix4.h"
 #include "RGLES2/RUtils.h"
 #include "RGLES2/RConstants.h"
+#include "RGLES2/RShader.h"
+
+// Drawing pipelines for RGLES2
+#include "RGLES2/RPipeline.h"
+#include "RGLES2/RDotPipeline.h"
+#include "RGLES2/RLinePipeline.h"
+#include "RGLES2/RTrianglePipeline.h"
+#include "RGLES2/RBasicTexturePipeline.h"
+#include "RGLES2/RTexturePipeline.h"
 
 #define rmalloc(n)    malloc(n)
 #define rrealloc(p,n) realloc(p,n)
@@ -172,108 +181,6 @@ struct rgles2info_t {
     GLint MAX_VIEWPORT_DIMS_WIDTH;
     GLint MAX_VIEWPORT_DIMS_HEIGHT;
 };
-
-
-// Shader class
-class RShader {
-    private:
-        GLuint programId;
-
-        GLint vertex_attrib;
-        GLint color_attrib;
-        GLint texcoord_attrib;
-
-        GLint tmtrx_uniform;
-        GLint tex0_uniform;
-    public:
-        RShader();
-        ~RShader();
-        RShader(const char* vertexSource, const char* fragSource);
-
-        int init(const char* vertexSource, const char* fragSource);
-
-        GLint getUniformLocation(const char* uniform);
-        GLint getAttribLocation(const char* attrib);
-
-        GLint getVertexAttrib()   const;
-        GLint getColorAttrib()    const;
-        GLint getTexcoordAttrib() const;
-
-        GLint getTransformMatrixUniform() const;
-        GLint getTextureUnitUniform()     const;
-
-        // Attach, dettach (Enable / Disable attributes and glUseProgram)
-        void attach()  const;
-        void dettach() const;
-};
-
-
-class RPipeline {
-    public:
-        virtual ~RPipeline();
-        // Enable rendering pipeline (Only on context change)
-        virtual void enable()  = 0;
-        // Disable rendering pipeline (Only on context change)
-        virtual void disable() = 0;
-        // Draw method (Receives pointer to auxiliary buffer)
-        virtual void draw(void* buffer) = 0;
-        // Set uniforms!
-        virtual void setTransform(RMatrix4& matrix) = 0;
-};
-
-
-class RDotPipeline : public RPipeline {
-    private:
-        RShader* internalShader;
-    public:
-        RDotPipeline();
-        ~RDotPipeline();
-
-        void enable();
-        void disable();
-        void setTransform(RMatrix4& matrix);
-        void draw(void* buffer);
-};
-
-class RLinePipeline : public RPipeline {
-    private:
-        RShader* internalShader;
-    public:
-        RLinePipeline();
-        ~RLinePipeline();
-
-        void enable();
-        void disable();
-        void setTransform(RMatrix4& matrix);
-        void draw(void* buffer);
-};
-
-class RTrianglePipeline : public RPipeline {
-    private:
-        RShader* internalShader;
-    public:
-        RTrianglePipeline();
-        ~RTrianglePipeline();
-
-        void enable();
-        void disable();
-        void setTransform(RMatrix4& matrix);
-        void draw(void* buffer);
-};
-
-class RTexturePipeline : public RPipeline {
-    private:
-        RShader* internalShader;
-    public:
-        RTexturePipeline();
-        ~RTexturePipeline();
-
-        void enable();
-        void disable();
-        void setTransform(RMatrix4& matrix);
-        void draw(void* buffer);
-};
-
 // ...
 
 // class RGLES2 : public AGL {

@@ -26,13 +26,16 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
 
-static void _id_progress_report(float progress){
-    if(ImageDriver::callback_fnc) ImageDriver::callback_fnc(progress);
-}
+static void _id_progress_report(float progress);
 
 #define STBIR_PROGRESS_REPORT(val) _id_progress_report(val)
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb/stb_image_resize.h"
+
+static void _id_progress_report(float progress){
+    if(ImageDriver::callback_fnc) ImageDriver::callback_fnc(progress);
+}
+
 
 int ImageDriver::infoImage(const char* fileName, int* sx, int* sy, int* n){
     return stbi_info(fileName, sx, sy, n);

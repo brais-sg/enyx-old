@@ -197,7 +197,7 @@ void Pixmap::fill(color_t color){
     }
 }
 
-
+// TODO: Fix flip!!
 void Pixmap::flipHorizontally(){
     if(this->exists() && this->isModifiable()){
         for(int y = 0; y < (this->height >> 1); y++){
@@ -334,7 +334,7 @@ Pixmap Pixmap::loadStaticArray(void* px_ptr, int width, int height, int componen
 }
 
 void Pixmap::saveImage(const char* fileName, const Pixmap& pixmap){
-    Debug::info("[%s:%d]: Saving image to file %s\n", fileName);
+    Debug::info("[%s:%d]: Saving image to file %s\n", __FILE__, __LINE__, fileName);
     if(ImageDriver::writeImage(fileName, pixmap.getWidth(), pixmap.getHeight(), pixmap.getComponents(), pixmap.getPixels())){
         Debug::error("[%s:%d]: Cannot save image to file %s\n", __FILE__, __LINE__, fileName);
     }

@@ -68,6 +68,22 @@ int main(){
         return -1;
     }
 
+    /*
+    Pixmap test = Pixmap::loadImage("pixmaptest.png");
+    printf("Resolution!\n");
+    printf("%dx%dx%d\n", test.getWidth(), test.getHeight(), test.getComponents());
+    for(int y = 0; y < test.getHeight(); y++){
+        for(int x = 0; x < test.getWidth(); x++){
+            color_t px = test.getPixel(x,y);
+            px = (px ^ 0xffffff00) | 0xff;
+            test.setPixel(x,y, px);
+        }
+    }
+
+    printf("Saving...\n");
+    Pixmap::saveImage("pixmapout.jpg", test);
+    test.free();
+    */
 
     while(Events::isAppRunning()){
         Events::processEvents();
